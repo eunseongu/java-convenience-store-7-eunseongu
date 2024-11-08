@@ -15,6 +15,9 @@ public class Product {
 
     @Override
     public String toString() {
-        return String.format("%s %d원 %d개 %s", name, price, quantity, promotion);
+        if (promotion.equals("null")) {
+            return String.format("- %s %,d원 %d개", name, price, quantity);
+        }
+        return String.format("- %s %,d원 %d개 %s", name, price, quantity, promotion);
     }
 }
