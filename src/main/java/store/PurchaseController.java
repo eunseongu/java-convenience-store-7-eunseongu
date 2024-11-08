@@ -2,12 +2,12 @@ package store;
 
 public class PurchaseController {
     InputView inputView = new InputView();
-    ProductsLoader productsLoader = new ProductsLoader();
+    ProductLoader productLoader = new ProductLoader();
     OutputView outputView = new OutputView();
 
     public void run() {
-        Inventory inventory = productsLoader.getInventory();
-        outputView.printProducts(inventory);
+        ProductInventory productInventory = productLoader.getInventory();
+        outputView.printProducts(productInventory);
 
         inputView.readItem();
     }
