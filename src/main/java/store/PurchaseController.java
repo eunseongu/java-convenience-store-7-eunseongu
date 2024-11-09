@@ -1,14 +1,18 @@
 package store;
 
+import java.util.List;
+
 public class PurchaseController {
-    InputView inputView = new InputView();
     ProductLoader productLoader = new ProductLoader();
     OutputView outputView = new OutputView();
+    InputHandler inputHandler = new InputHandler();
 
     public void run() {
         ProductInventory productInventory = productLoader.getInventory();
         outputView.printProducts(productInventory);
 
-        inputView.readItem();
+        String itemInput = InputView.readItem();
+
+        List<Item> items = inputHandler.parseItemInput(itemInput);
     }
 }

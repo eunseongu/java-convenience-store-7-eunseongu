@@ -2,10 +2,10 @@ package store;
 
 public class Item {
     private String name;
-    private int count;
+    private int quantity;
 
-    public Item(String name, int count) {
+    public Item(String name, int quantity) {
         this.name = name;
-        this.count = count;
+        this.quantity = quantity;
     }
 }
