@@ -30,6 +30,25 @@ public class ProductInventory {
         }
     }
 
+    public String isPromotionalItem(String productName) {
+        if (hasProduct(productName)) {
+            for (Product product : inventory.get(productName)) {
+                if (product.isPromotion()) {
+                    return product.getPromotion();
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean hasProduct(String productName) {
+        if (!inventory.containsKey(productName)) {
+            throw new IllegalArgumentException(ErrorMessage.ITEM_NOT_EXIST.getMessage());
+        }
+        return true;
+    }
+
+
     public void printProducts() {
         for (List<Product> products : inventory.values()) {
             for (Product product : products) {

@@ -21,6 +21,10 @@ public class Product {
         return price;
     }
 
+    public String getPromotion() {
+        return promotion;
+    }
+
     public boolean isPromotion() {
         return promotion != null && !promotion.equals("null") && !promotion.isEmpty();
     }

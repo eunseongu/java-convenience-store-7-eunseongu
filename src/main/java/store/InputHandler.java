@@ -20,13 +20,13 @@ public class InputHandler {
 
     private void validateItemFormat(String item) {
         if (!item.startsWith("[") || !item.endsWith("]")) {
-            throw new IllegalArgumentException(ErrorMessage.FORMAT_BRACKETS.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
         }
         if (item.chars().filter(ch -> ch == '[').count() != 1 || item.chars().filter(ch -> ch == ']').count() != 1) {
-            throw new IllegalArgumentException(ErrorMessage.FORMAT_BRACKETS.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
         }
         if (!item.contains("-") || item.indexOf('-') != item.lastIndexOf('-')) {
-            throw new IllegalArgumentException(ErrorMessage.FORMAT_HYPHEN.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
         }
     }
 
@@ -37,7 +37,7 @@ public class InputHandler {
         validateItemName(itemName);
 
         if (itemDetails.size() == 1 || itemDetails.get(1).isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessage.EMPTY_ITEM_QUANTITY.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
         int itemQuantity = parseItemQuantity(itemDetails);
 
@@ -46,10 +46,10 @@ public class InputHandler {
 
     private void validateItemName(String itemName) {
         if (itemName.isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessage.EMPTY_ITEM_NAME.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
         if (itemName.chars().filter(ch -> ch == '-').count() > 1) {
-            throw new IllegalArgumentException(ErrorMessage.FORMAT_HYPHEN.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
         }
     }
 
@@ -59,7 +59,7 @@ public class InputHandler {
         try {
             itemQuantity = Integer.parseInt(itemDetails.get(1));
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_ITEM_QUANTITY.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
         validateItemQuantity(itemQuantity);
 
@@ -68,13 +68,13 @@ public class InputHandler {
 
     private void validateItemQuantity(int itemQuantity) {
         if (itemQuantity <= 0) {
-            throw new IllegalArgumentException(ErrorMessage.ITEM_QUANTITY_CANNOT_BE_ZERO.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
     }
 
     private void validateItemInput(String itemInput) {
         if (itemInput == null || itemInput.isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessage.EMPTY_INPUT.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
     }
 }
