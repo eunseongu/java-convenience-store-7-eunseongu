@@ -3,16 +3,10 @@ package store;
 public enum ErrorMessage {
     ERROR_PREFIX("[ERROR]"),
 
-    EMPTY_INPUT("입력은 비어 있을 수 없습니다."),
-
-    FORMAT_BRACKETS("구매 정보 입력의 대괄호 형식이 유효하지 않습니다."),
-    FORMAT_HYPHEN("상품명과 구매 수량을 구분하는 하이픈은 하나만 있어야 합니다."),
-
-    INVALID_ITEM_QUANTITY("구매 수량은 숫자여야 합니다."),
-    EMPTY_ITEM_QUANTITY("구매 수량은 비어 있을 수 없습니다."),
-    ITEM_QUANTITY_CANNOT_BE_ZERO("구매 수량은 0일 수 없습니다."),
-
-    EMPTY_ITEM_NAME("상품명은 비어 있을 수 없습니다.");
+    INVALID_INPUT("잘못된 입력입니다. 다시 입력해 주세요."),
+    INVALID_FORMAT("올바르지 않은 형식으로 입력했습니다. 다시 입력해 주세요."),
+    QUANTITY_EXCEEDS_STOCK("재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요."),
+    ITEM_NOT_EXIST("존재하지 않는 상품입니다. 다시 입력해 주세요.");
 
     private final String message;
 
