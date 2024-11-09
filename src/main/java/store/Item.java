@@ -16,4 +16,12 @@ public class Item {
     public int getQuantity() {
         return quantity;
     }
+
+    public Integer getPrice(ProductInventory productInventory) {
+        return productInventory.getProductPriceByName(name);
+    }
+
+    public String getPromotionType(ProductInventory productInventory) {
+        return productInventory.isPromotionalItem(name);
+    }
 }

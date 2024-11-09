@@ -4,6 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InputHandler {
+    public List<Item> getValidatedItems() {
+        List<Item> items = null;
+        while (items == null) {
+            try {
+                String itemInput = InputView.readItem();
+                items = parseItemInput(itemInput);
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return items;
+    }
+
     public List<Item> parseItemInput(String itemInput) {
         validateItemInput(itemInput);
         List<String> items = List.of(itemInput.split(","));
@@ -17,6 +30,7 @@ public class InputHandler {
 
         return parsedItems;
     }
+
 
     private void validateItemFormat(String item) {
         if (!item.startsWith("[") || !item.endsWith("]")) {

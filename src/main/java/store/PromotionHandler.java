@@ -5,9 +5,11 @@ import java.util.List;
 public class PromotionHandler {
     private final PromotionManager promotionManager;
     private final InputView inputView;
+    private final UserCart userCart;
 
-    public PromotionHandler(PromotionManager promotionManager, InputView inputView) {
+    public PromotionHandler(PromotionManager promotionManager, UserCart userCart, InputView inputView) {
         this.promotionManager = promotionManager;
+        this.userCart = userCart;
         this.inputView = inputView;
     }
 
@@ -15,13 +17,15 @@ public class PromotionHandler {
         for (Item item : items) {
             String promotionType = productInventory.isPromotionalItem(item.getName());
             if (promotionType != null) {
+                addPromotionItemToCart(item, productInventory);
+
                 boolean canAddBonus = promotionManager.validate(promotionType, item);
 
                 while (canAddBonus) {
                     String userInput = inputView.confirmAddBonusItem(item.getName());
                     try {
                         validateYesOrNoInput(userInput);
-                        // 유효한 입력이면 루프 종료
+                        addFreeItemToCart(item, userInput);
                         break;
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
@@ -33,7 +37,20 @@ public class PromotionHandler {
 
     private void validateYesOrNoInput(String input) {
         if (!input.equalsIgnoreCase("Y") && !input.equalsIgnoreCase("N")) {
-            throw new IllegalArgumentException("Invalid input. Please enter 'Y' or 'N'.");
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
+        }
+    }
+
+    private void addPromotionItemToCart(Item item, ProductInventory productInventory) {
+        Integer price = productInventory.getProductPriceByName(item.getName());
+        if (price != null) {
+            userCart.addPromotionPurchase(item.getName(), item.getQuantity(), price);
+        }
+    }
+
+    private void addFreeItemToCart(Item item, String input) {
+        if (input.equalsIgnoreCase("Y")) {
+            userCart.addFreePurchase(item.getName(), 1);
         }
     }
 }

@@ -15,6 +15,17 @@ public class ProductInventory {
         inventory.get(name).add(product);
     }
 
+    public Integer getProductPriceByName(String itemName) {
+        if (inventory.containsKey(itemName)) {
+            for (Product product : inventory.get(itemName)) {
+                if (!product.isPromotion()) {
+                    return product.getPrice();
+                }
+            }
+        }
+        return null;
+    }
+    
     public void addRegularStockIfMissing() {
         for (Map.Entry<String, List<Product>> entry : inventory.entrySet()) {
             String productName = entry.getKey();
