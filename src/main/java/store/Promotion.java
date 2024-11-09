@@ -23,19 +23,18 @@ public class Promotion {
         return name;
     }
 
-    public void validate(Item item) {
-        if (isPromotionActive()) {
-            validatePurchaseQuantity(item);
+    public boolean validate(Item item) {
+        if (isPromotionActive() && canReceiveBonus(item)) {
+            return true;
         }
+        return false;
     }
 
-    private void validatePurchaseQuantity(Item item) {
+    private boolean canReceiveBonus(Item item) {
         int BuyNGet1Free = this.buyQuantity + this.getQuantity;
         int purchaseQuantity = item.getQuantity();
 
-        if (purchaseQuantity % BuyNGet1Free == this.buyQuantity) {
-            System.out.printf("현재 %s은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)%n", item.getName());
-        }
+        return purchaseQuantity % BuyNGet1Free == this.buyQuantity;
     }
 
     private boolean isPromotionActive() {

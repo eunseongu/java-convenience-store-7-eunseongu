@@ -12,13 +12,11 @@ public class PromotionManager {
         promotions.put(name, promotion);
     }
 
-    public void validate(String promotionType, Item item) {
+    public boolean validate(String promotionType, Item item) {
         Promotion promotion = promotions.get(promotionType);
-
         if (promotion == null) {
             throw new IllegalArgumentException("Promotion type not found");
         }
-
-        promotion.validate(item);
+        return promotion.validate(item);
     }
 }
