@@ -4,11 +4,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import store.console.InputHandler;
+import store.console.InputValidator;
+import store.product.ProductInventory;
 import store.util.ErrorMessage;
 
 
 class ItemTest {
-    private final InputHandler inputHandler = new InputHandler();
+    private final ProductInventory productInventory = new ProductInventory();
+    private final InputValidator inputValidator = new InputValidator(productInventory);
+    private final InputHandler inputHandler = new InputHandler(inputValidator);
 
     @Test
     void 구매_정보_입력이_비어_있으면_예외가_발생한다() {
