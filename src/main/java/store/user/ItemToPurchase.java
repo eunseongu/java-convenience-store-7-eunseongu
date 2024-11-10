@@ -1,10 +1,10 @@
 package store.user;
 
-public class Item {
+public class ItemToPurchase {
     private String name;
     private int quantity;
 
-    public Item(String name, int quantity) {
+    public ItemToPurchase(String name, int quantity) {
         this.name = name;
         this.quantity = quantity;
     }

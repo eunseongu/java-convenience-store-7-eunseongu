@@ -2,14 +2,18 @@ package store.console;
 
 import java.util.ArrayList;
 import java.util.List;
-import store.user.Item;
+import store.user.ItemToPurchase;
 import store.util.ErrorMessage;
 
 public class InputHandler {
-    private InputValidator inputValidator = new InputValidator();
+    private InputValidator inputValidator;
 
-    public List<Item> getValidatedItems() {
-        List<Item> items = null;
+    public InputHandler(InputValidator inputValidator) {
+        this.inputValidator = inputValidator;
+    }
+
+    public List<ItemToPurchase> getValidatedItems() {
+        List<ItemToPurchase> items = null;
         while (items == null) {
             try {
                 String itemInput = InputView.readItem();
@@ -21,21 +25,22 @@ public class InputHandler {
         return items;
     }
 
-    public List<Item> parseItemInput(String itemInput) {
+    public List<ItemToPurchase> parseItemInput(String itemInput) {
         inputValidator.validateItemInput(itemInput);
         List<String> items = List.of(itemInput.split(","));
-        List<Item> parsedItems = new ArrayList<>();
+        List<ItemToPurchase> parsedItems = new ArrayList<>();
 
         for (String item : items) {
             inputValidator.validateItemFormat(item);
-            Item parsedItem = parseItemDetails(item);
+            ItemToPurchase parsedItem = parseItemDetails(item);
+//            inputValidator.validateItemStock(parsedItem);
             parsedItems.add(parsedItem);
         }
 
         return parsedItems;
     }
 
-    private Item parseItemDetails(String item) {
+    private ItemToPurchase parseItemDetails(String item) {
         List<String> itemDetails = List.of(item.replace("[", "").replace("]", "").split("-"));
 
         String itemName = itemDetails.get(0);
@@ -46,7 +51,7 @@ public class InputHandler {
         }
         int itemQuantity = parseItemQuantity(itemDetails);
 
-        return new Item(itemName, itemQuantity);
+        return new ItemToPurchase(itemName, itemQuantity);
     }
 
 
@@ -63,5 +68,15 @@ public class InputHandler {
         return itemQuantity;
     }
 
-
+    public boolean applyMembership() {
+        while (true) {
+            String response = InputView.askToApplyMembershipDiscount();
+            try {
+                inputValidator.validateResponse(response);
+                return response.equalsIgnoreCase("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 }

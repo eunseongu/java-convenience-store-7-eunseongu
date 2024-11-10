@@ -18,9 +18,9 @@ public class OutputView {
         System.out.println("===========증\t정=============");
         userCart.printFreePurchases();
         System.out.println("==============================");
-        System.out.println("총구매액");
-        System.out.println("행사할인");
-        System.out.println("멤버십할인");
-        System.out.println("내실돈");
+        System.out.printf("총구매액\t\t%d\t%,d%n", userCart.calculateCombinedQuantity(), userCart.calculateTotalPrice());
+        System.out.printf("행사할인\t\t\t-%,d%n", userCart.calculatePromotionDiscountPrice());
+        System.out.printf("멤버십할인\t\t\t-%,d%n", userCart.getMembershipDiscountPrice());
+        System.out.printf("내실돈\t\t\t%,d%n", userCart.calculatefinalPrice());
     }
 }

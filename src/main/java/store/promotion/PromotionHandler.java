@@ -4,33 +4,40 @@ import java.util.List;
 import store.console.InputValidator;
 import store.console.InputView;
 import store.product.ProductInventory;
-import store.user.Item;
+import store.user.ItemToPurchase;
 import store.user.UserCart;
 
 public class PromotionHandler {
     private final PromotionManager promotionManager;
     private final InputView inputView;
     private final UserCart userCart;
-    private final InputValidator inputValidator = new InputValidator();
+    private final InputValidator inputValidator;
 
-    public PromotionHandler(PromotionManager promotionManager, UserCart userCart, InputView inputView) {
+    public PromotionHandler(PromotionManager promotionManager, UserCart userCart, InputView inputView,
+                            InputValidator inputValidator) {
         this.promotionManager = promotionManager;
         this.userCart = userCart;
         this.inputView = inputView;
+        this.inputValidator = inputValidator;
     }
 
-    public void applyPromotions(ProductInventory inventory, List<Item> items) {
-        for (Item item : items) {
-            String promotion = inventory.isPromotionalItem(item.getName());
-            if (promotion == null) {
+    public void applyPromotions(ProductInventory inventory, List<ItemToPurchase> items) {
+        for (ItemToPurchase item : items) {
+            String promotionType = inventory.isPromotionalItem(item.getName());
+            if (promotionType == null) {
                 continue;
             }
-            applyPromotion(item, inventory, promotionManager.getPromotion(promotion));
+            Promotion promotion = promotionManager.getPromotion(promotionType);
+            if (promotionManager.validatePromotion(promotion.getName(), item)) {
+                applyPromotion(item, inventory, promotion);
+            } else {
+                checkRegularInventory(item, inventory);
+            }
         }
     }
 
-    private void applyPromotion(Item item, ProductInventory inventory, Promotion promotion) {
-        if (promotionManager.validatePromotion(promotion.getName(), item) && promotion.canReceiveBonus(item)) {
+    private void applyPromotion(ItemToPurchase item, ProductInventory inventory, Promotion promotion) {
+        if (promotion.canReceiveBonus(item)) {
             if (askToAddBonus(item)) {
                 checkInventory(item, inventory, promotion, true);
                 return;
@@ -41,7 +48,7 @@ public class PromotionHandler {
         checkInventory(item, inventory, promotion, false);
     }
 
-    private boolean askToAddBonus(Item item) {
+    private boolean askToAddBonus(ItemToPurchase item) {
         while (true) {
             String response = inputView.askToAddBonusItem(item.getName());
             try {
@@ -53,7 +60,8 @@ public class PromotionHandler {
         }
     }
 
-    private void checkInventory(Item item, ProductInventory inventory, Promotion promotion, boolean withBonus) {
+    private void checkInventory(ItemToPurchase item, ProductInventory inventory, Promotion promotion,
+                                boolean withBonus) {
         try {
             int requiredRegularQuantity = inventory.getRequiredRegularStock(item.getName(),
                     item.getQuantity() + (withBonus ? 1 : 0), promotion);
@@ -68,7 +76,18 @@ public class PromotionHandler {
         }
     }
 
-    private void askToPurchaseWithoutPromotion(Item item, ProductInventory inventory, int requiredRegularQuantity,
+    private void checkRegularInventory(ItemToPurchase item, ProductInventory inventory) {
+        try {
+            inventory.checkRegularStock(item);
+            //재고 부족하면 예외
+            addRegularItemToCart(item, item.getQuantity(), inventory);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void askToPurchaseWithoutPromotion(ItemToPurchase item, ProductInventory inventory,
+                                               int requiredRegularQuantity,
                                                Promotion promotion, boolean withBonus) {
         while (true) {
             String response = inputView.askToPurchaseWithoutPromotion(item.getName(), requiredRegularQuantity);
@@ -88,7 +107,7 @@ public class PromotionHandler {
         }
     }
 
-    private void addPromotionItemToCartWithBonus(Item item, int totalQuantity, ProductInventory inventory,
+    private void addPromotionItemToCartWithBonus(ItemToPurchase item, int totalQuantity, ProductInventory inventory,
                                                  Promotion promotion) {
         String name = item.getName();
         Integer price = inventory.getProductPriceByName(name);
@@ -110,7 +129,7 @@ public class PromotionHandler {
         }
     }
 
-    private void addPromotionItemToCart(Item item, int qty, ProductInventory inventory) {
+    private void addPromotionItemToCart(ItemToPurchase item, int qty, ProductInventory inventory) {
         String name = item.getName();
         Integer price = inventory.getProductPriceByName(name);
         if (price != null) {
@@ -119,7 +138,7 @@ public class PromotionHandler {
         }
     }
 
-    private void addRegularItemToCart(Item item, int qty, ProductInventory inventory) {
+    private void addRegularItemToCart(ItemToPurchase item, int qty, ProductInventory inventory) {
         String name = item.getName();
         Integer price = inventory.getProductPriceByName(name);
         if (price != null) {

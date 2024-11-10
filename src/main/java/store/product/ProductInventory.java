@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import store.promotion.Promotion;
+import store.user.ItemToPurchase;
 import store.util.ErrorMessage;
 
 public class ProductInventory {
@@ -87,7 +88,7 @@ public class ProductInventory {
     }
 
     // 일반 재고 수량 계산
-    private int calculateRegularStock(List<Product> products, int requiredFromRegularStock) {
+    public int calculateRegularStock(List<Product> products, int requiredFromRegularStock) {
         int regularStock = products.stream()
                 .filter(product -> !product.isPromotion())
                 .mapToInt(Product::getQuantity)
@@ -110,6 +111,19 @@ public class ProductInventory {
         products.add(new Product(products.getFirst().getName(), productPrice, 0, "null"));
     }
 
+    public void checkRegularStock(ItemToPurchase item) {
+        List<Product> products = inventory.get(item.getName());
+
+        int regularStock = products.stream()
+                .filter(product -> !product.isPromotion())
+                .mapToInt(Product::getQuantity)
+                .sum();
+
+        if (regularStock < item.getQuantity()) {
+            throw new IllegalArgumentException(ErrorMessage.QUANTITY_EXCEEDS_STOCK.getMessage());
+        }
+    }
+
     public void decreaseRegularProductQuantity(String productName, int quantity) {
         List<Product> products = inventory.get(productName);
         for (Product product : products) {
@@ -126,6 +140,20 @@ public class ProductInventory {
                 product.decreaseQuantity(quantity);
             }
         }
+    }
+
+    public boolean hasSufficientStock(ItemToPurchase item) {
+        if (!inventory.containsKey(item.getName())) {
+            throw new IllegalArgumentException(ErrorMessage.ITEM_NOT_EXIST.getMessage());
+        }
+
+        List<Product> products = inventory.get(item.getName());
+        int availableStock = products.stream()
+                .filter(product -> !product.isPromotion())
+                .mapToInt(Product::getQuantity)
+                .sum();
+
+        return availableStock >= item.getQuantity();
     }
 
     public void printProducts() {

@@ -4,20 +4,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserCart {
-    private Map<String, PurchaseItem> regularPurchases;
-    private Map<String, PurchaseItem> promotionPurchases;
-    private Map<String, PurchaseItem> freePurchases;
+    private Map<String, PurchasedItem> regularPurchases;
+    private Map<String, PurchasedItem> promotionPurchases;
+    private Map<String, PurchasedItem> freePurchases;
+    private Map<String, PurchasedItem> combinedPurchases = new HashMap<>();
+    private int membershipDiscountPrice;
+    private int promotionDiscountPrice;
+    private int totalPrice;
 
     public UserCart() {
         this.regularPurchases = new HashMap<>();
         this.promotionPurchases = new HashMap<>();
         this.freePurchases = new HashMap<>();
+        this.combinedPurchases = new HashMap<>();
+        this.membershipDiscountPrice = 0;
+        this.promotionDiscountPrice = 0;
+        this.totalPrice = 0;
     }
 
     public void addRegularPurchase(String productName, int quantity, int price) {
         regularPurchases.compute(productName, (key, existingItem) -> {
             if (existingItem == null) {
-                return new PurchaseItem(key, quantity, price);
+                return new PurchasedItem(key, quantity, price);
             } else {
                 existingItem.increaseQuantity(quantity);
                 return existingItem;
@@ -28,7 +36,7 @@ public class UserCart {
     public void addPromotionPurchase(String productName, int quantity, int price) {
         promotionPurchases.compute(productName, (key, existingItem) -> {
             if (existingItem == null) {
-                return new PurchaseItem(key, quantity, price);
+                return new PurchasedItem(key, quantity, price);
             } else {
                 existingItem.increaseQuantity(quantity);
                 return existingItem;
@@ -39,7 +47,7 @@ public class UserCart {
     public void addFreePurchase(String productName, int quantity) {
         freePurchases.compute(productName, (key, existingItem) -> {
             if (existingItem == null) {
-                return new PurchaseItem(key, quantity, 0);
+                return new PurchasedItem(key, quantity, 0);
             } else {
                 existingItem.increaseQuantity(quantity);
                 return existingItem;
@@ -48,24 +56,27 @@ public class UserCart {
     }
 
     public void printCombinedPurchases() {
-        Map<String, PurchaseItem> combinedQuantities = new HashMap<>();
 
-        combinePurchases(regularPurchases, combinedQuantities);
-        combinePurchases(promotionPurchases, combinedQuantities);
-        combinePurchases(freePurchases, combinedQuantities);
+        combinePurchases(regularPurchases, combinedPurchases);
+        combinePurchases(promotionPurchases, combinedPurchases);
+        combinePurchases(freePurchases, combinedPurchases);
 
-        for (PurchaseItem item : combinedQuantities.values()) {
+        for (PurchasedItem item : combinedPurchases.values()) {
             item.printItem();
         }
     }
 
-    private void combinePurchases(Map<String, PurchaseItem> purchases, Map<String, PurchaseItem> combinedQuantities) {
-        for (Map.Entry<String, PurchaseItem> entry : purchases.entrySet()) {
+    public int calculateCombinedQuantity() {
+        return combinedPurchases.size();
+    }
+
+    private void combinePurchases(Map<String, PurchasedItem> purchases, Map<String, PurchasedItem> combinedQuantities) {
+        for (Map.Entry<String, PurchasedItem> entry : purchases.entrySet()) {
             String productName = entry.getKey();
             int quantity = entry.getValue().getQuantity();
 
             if (combinedQuantities.containsKey(productName)) {
-                PurchaseItem existingItem = combinedQuantities.get(productName);
+                PurchasedItem existingItem = combinedQuantities.get(productName);
                 existingItem.increaseQuantity(quantity);
             } else {
                 combinedQuantities.put(productName, entry.getValue());
@@ -74,8 +85,47 @@ public class UserCart {
     }
 
     public void printFreePurchases() {
-        for (PurchaseItem item : freePurchases.values()) {
+        for (PurchasedItem item : freePurchases.values()) {
             item.printItem();
         }
+    }
+
+    public int calculatePromotionDiscountPrice() {
+        for (String itemName : freePurchases.keySet()) {
+            int quantity = freePurchases.get(itemName).getQuantity();
+            int price = promotionPurchases.get(itemName).getPrice();
+
+            this.promotionDiscountPrice += price * quantity;
+
+        }
+        return this.promotionDiscountPrice;
+    }
+
+
+    public int calculateTotalPrice() {
+        for (PurchasedItem item : combinedPurchases.values()) {
+            this.totalPrice += item.getTotalPrice();
+        }
+
+        return this.totalPrice;
+    }
+
+    public int calculateMembershipDiscount() {
+        for (PurchasedItem item : regularPurchases.values()) {
+            this.membershipDiscountPrice += item.getTotalPrice() * 0.7;
+        }
+
+        if (this.membershipDiscountPrice > 8000) {
+            this.membershipDiscountPrice = 8000;
+        }
+        return this.membershipDiscountPrice;
+    }
+
+    public int calculatefinalPrice() {
+        return totalPrice - membershipDiscountPrice - promotionDiscountPrice;
+    }
+
+    public int getMembershipDiscountPrice() {
+        return this.membershipDiscountPrice;
     }
 }
