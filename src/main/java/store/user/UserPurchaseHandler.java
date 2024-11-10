@@ -2,17 +2,20 @@ package store.user;
 
 import java.util.HashMap;
 import java.util.Map;
+import store.product.ProductInventory;
+import store.promotion.Promotion;
+import store.purchase.Item;
 
-public class UserCart {
-    private Map<String, PurchasedItem> regularPurchases;
-    private Map<String, PurchasedItem> promotionPurchases;
-    private Map<String, PurchasedItem> freePurchases;
-    private Map<String, PurchasedItem> combinedPurchases = new HashMap<>();
+public class UserPurchaseHandler {
+    private final Map<String, PurchasedItem> regularPurchases;
+    private final Map<String, PurchasedItem> promotionPurchases;
+    private final Map<String, PurchasedItem> freePurchases;
+    private final Map<String, PurchasedItem> combinedPurchases;
     private int membershipDiscountPrice;
     private int promotionDiscountPrice;
     private int totalPrice;
 
-    public UserCart() {
+    public UserPurchaseHandler() {
         this.regularPurchases = new HashMap<>();
         this.promotionPurchases = new HashMap<>();
         this.freePurchases = new HashMap<>();
@@ -22,32 +25,56 @@ public class UserCart {
         this.totalPrice = 0;
     }
 
+    public void addRegularItem(Item item, int quantity, ProductInventory inventory) {
+        String name = item.getName();
+        Integer price = inventory.getProductPriceByName(name);
+        if (price != null) {
+            addRegularPurchase(name, quantity, price);
+            inventory.decreaseRegularProductQuantity(name, quantity);
+        }
+    }
+
+    public void addPromotionItemWithFreeItem(String name, int totalQuantity, ProductInventory inventory,
+                                             Promotion promotion) {
+        Integer price = inventory.getProductPriceByName(name);
+
+        if (price != null) {
+            int buyQuantity = calculateBuyQuantity(totalQuantity, promotion);
+            int getQuantity = totalQuantity - buyQuantity;
+
+            addPromotionPurchase(name, buyQuantity, price);
+            addFreePurchase(name, getQuantity);
+            inventory.decreasePromotionProductQuantity(name, totalQuantity);
+        }
+    }
+
+    private int calculateBuyQuantity(int totalQuantity, Promotion promotion) {
+        int buyQuantity = 0;
+        if (promotion.getBuyQuantity() == 1) {
+            buyQuantity = totalQuantity / 2;
+        }
+        if (promotion.getBuyQuantity() == 2) {
+            buyQuantity = (totalQuantity / 3) * 2;
+        }
+        return buyQuantity;
+    }
+
     public void addRegularPurchase(String productName, int quantity, int price) {
-        regularPurchases.compute(productName, (key, existingItem) -> {
-            if (existingItem == null) {
-                return new PurchasedItem(key, quantity, price);
-            } else {
-                existingItem.increaseQuantity(quantity);
-                return existingItem;
-            }
-        });
+        addPurchase(regularPurchases, productName, quantity, price);
     }
 
     public void addPromotionPurchase(String productName, int quantity, int price) {
-        promotionPurchases.compute(productName, (key, existingItem) -> {
-            if (existingItem == null) {
-                return new PurchasedItem(key, quantity, price);
-            } else {
-                existingItem.increaseQuantity(quantity);
-                return existingItem;
-            }
-        });
+        addPurchase(promotionPurchases, productName, quantity, price);
     }
 
     public void addFreePurchase(String productName, int quantity) {
-        freePurchases.compute(productName, (key, existingItem) -> {
+        addPurchase(freePurchases, productName, quantity, 0);
+    }
+
+    private void addPurchase(Map<String, PurchasedItem> purchases, String productName, int quantity, int price) {
+        purchases.compute(productName, (key, existingItem) -> {
             if (existingItem == null) {
-                return new PurchasedItem(key, quantity, 0);
+                return new PurchasedItem(key, quantity, price);
             } else {
                 existingItem.increaseQuantity(quantity);
                 return existingItem;
@@ -61,6 +88,12 @@ public class UserCart {
         combinePurchases(freePurchases, combinedPurchases);
 
         for (PurchasedItem item : combinedPurchases.values()) {
+            item.printItem();
+        }
+    }
+
+    public void printFreePurchases() {
+        for (PurchasedItem item : freePurchases.values()) {
             item.printItem();
         }
     }
@@ -79,7 +112,7 @@ public class UserCart {
         }
     }
 
-    public int calculateCombinedQuantity() {
+    public int calculateTotalQuantity() {
         int totalQuantity = 0;
         for (PurchasedItem item : combinedPurchases.values()) {
             totalQuantity += item.getQuantity();
@@ -87,10 +120,12 @@ public class UserCart {
         return totalQuantity;
     }
 
-    public void printFreePurchases() {
-        for (PurchasedItem item : freePurchases.values()) {
-            item.printItem();
+    public int calculateTotalPrice() {
+        for (PurchasedItem item : combinedPurchases.values()) {
+            this.totalPrice += item.getTotalPrice();
         }
+
+        return this.totalPrice;
     }
 
     public int calculatePromotionDiscountPrice() {
@@ -104,31 +139,22 @@ public class UserCart {
         return this.promotionDiscountPrice;
     }
 
-
-    public int calculateTotalPrice() {
-        for (PurchasedItem item : combinedPurchases.values()) {
-            this.totalPrice += item.getTotalPrice();
-        }
-
-        return this.totalPrice;
-    }
-
-    public int calculateMembershipDiscount() {
+    public void calculateMembershipDiscount() {
         for (PurchasedItem item : regularPurchases.values()) {
-            this.membershipDiscountPrice += item.getTotalPrice() * 0.3;
+            this.membershipDiscountPrice += (int) (item.getTotalPrice() * 0.3);
         }
 
         if (this.membershipDiscountPrice > 8000) {
             this.membershipDiscountPrice = 8000;
         }
-        return this.membershipDiscountPrice;
-    }
-
-    public int calculatefinalPrice() {
-        return totalPrice - membershipDiscountPrice - promotionDiscountPrice;
     }
 
     public int getMembershipDiscountPrice() {
         return this.membershipDiscountPrice;
     }
+
+    public int calculateFinalPrice() {
+        return totalPrice - membershipDiscountPrice - promotionDiscountPrice;
+    }
+
 }

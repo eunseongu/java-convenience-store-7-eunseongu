@@ -1,7 +1,7 @@
 package store.console;
 
 import store.product.ProductInventory;
-import store.user.UserCart;
+import store.user.UserPurchaseHandler;
 
 public class OutputView {
     public void printProducts(ProductInventory productInventory) {
@@ -11,16 +11,17 @@ public class OutputView {
         productInventory.printProducts();
     }
 
-    public void printReceipt(UserCart userCart) {
+    public void printReceipt(UserPurchaseHandler userPurchaseHandler) {
         System.out.println("===========W 편의점=============");
         System.out.println("상품명\t\t수량\t금액");
-        userCart.printCombinedPurchases();
+        userPurchaseHandler.printCombinedPurchases();
         System.out.println("===========증\t정=============");
-        userCart.printFreePurchases();
+        userPurchaseHandler.printFreePurchases();
         System.out.println("==============================");
-        System.out.printf("총구매액\t\t%d\t%,d%n", userCart.calculateCombinedQuantity(), userCart.calculateTotalPrice());
-        System.out.printf("행사할인\t\t\t-%,d%n", userCart.calculatePromotionDiscountPrice());
-        System.out.printf("멤버십할인\t\t\t-%,d%n", userCart.getMembershipDiscountPrice());
-        System.out.printf("내실돈\t\t\t%,d%n", userCart.calculatefinalPrice());
+        System.out.printf("총구매액\t\t%d\t%,d%n", userPurchaseHandler.calculateTotalQuantity(),
+                userPurchaseHandler.calculateTotalPrice());
+        System.out.printf("행사할인\t\t\t-%,d%n", userPurchaseHandler.calculatePromotionDiscountPrice());
+        System.out.printf("멤버십할인\t\t\t-%,d%n", userPurchaseHandler.getMembershipDiscountPrice());
+        System.out.printf("내실돈\t\t\t%,d%n", userPurchaseHandler.calculateFinalPrice());
     }
 }

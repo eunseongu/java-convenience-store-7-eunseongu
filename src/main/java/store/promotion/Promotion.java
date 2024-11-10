@@ -3,14 +3,14 @@ package store.promotion;
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import store.user.Item;
+import store.purchase.Item;
 
 public class Promotion {
-    private String name;
-    private int buyQuantity;
-    private int getQuantity;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private final String name;
+    private final int buyQuantity;
+    private final int getQuantity;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
 
     public Promotion(String name, int buyQuantity, int getQuantity, String startDate, String endDate) {
         this.name = name;
@@ -32,7 +32,7 @@ public class Promotion {
         return getQuantity;
     }
 
-    public boolean canReceiveBonus(Item item) {
+    public boolean canReceiveFreeItem(Item item) {
         int BuyNGet1Free = this.buyQuantity + this.getQuantity;
         int purchaseQuantity = item.getQuantity();
 

@@ -1,10 +1,10 @@
 package store.product;
 
 public class Product {
-    private String name;
-    private int price;
+    private final String name;
+    private final int price;
+    private final String promotion;
     private int quantity;
-    private String promotion;
 
     public Product(String name, int price, int quantity, String promotion) {
         this.name = name;

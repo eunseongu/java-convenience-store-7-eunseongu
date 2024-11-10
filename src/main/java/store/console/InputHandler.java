@@ -2,11 +2,11 @@ package store.console;
 
 import java.util.ArrayList;
 import java.util.List;
-import store.user.Item;
+import store.purchase.Item;
 import store.util.ErrorMessage;
 
 public class InputHandler {
-    private InputValidator inputValidator;
+    private final InputValidator inputValidator;
 
     public InputHandler(InputValidator inputValidator) {
         this.inputValidator = inputValidator;
@@ -61,7 +61,7 @@ public class InputHandler {
         }
     }
 
-    private List<Item> parseItemInput(String itemInput) {
+    public List<Item> parseItemInput(String itemInput) {
         inputValidator.validateItemInput(itemInput);
         List<String> items = List.of(itemInput.split(","));
         List<Item> parsedItems = new ArrayList<>();
@@ -88,7 +88,6 @@ public class InputHandler {
 
         return new Item(itemName, itemQuantity);
     }
-
 
     private int parseItemQuantity(List<String> itemDetails) {
         int itemQuantity;

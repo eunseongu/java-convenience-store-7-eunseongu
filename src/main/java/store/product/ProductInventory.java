@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import store.promotion.Promotion;
-import store.user.Item;
+import store.purchase.Item;
 import store.util.ErrorMessage;
 
 public class ProductInventory {
@@ -28,6 +28,7 @@ public class ProductInventory {
         return null;
     }
 
+    // 프로모션 재고에 대한 정보만 있는 경우, 일반 재고를 재고 없음으로 추가
     public void addRegularStockIfMissing() {
         for (Map.Entry<String, List<Product>> entry : inventory.entrySet()) {
             List<Product> products = entry.getValue();
@@ -36,6 +37,15 @@ public class ProductInventory {
                 addMissingRegularStock(products);
             }
         }
+    }
+
+    private boolean hasRegularStock(List<Product> products) {
+        return products.stream().anyMatch(product -> !product.isPromotion());
+    }
+
+    private void addMissingRegularStock(List<Product> products) {
+        int productPrice = products.getFirst().getPrice();
+        products.add(new Product(products.getFirst().getName(), productPrice, 0, "null"));
     }
 
     public String getPromotionType(String productName) {
@@ -49,20 +59,6 @@ public class ProductInventory {
         return null;
     }
 
-    // 일반 재고 수량 계산
-    public int getRequiredRegularStock(String itemName, int itemQuantity, Promotion promotion) {
-        List<Product> products = inventory.get(itemName);
-        int promotionStock = calculatePromotionStock(products);
-        int promoApplicableCount = calculatePromoApplicableCount(itemQuantity, promotionStock, promotion);
-        int requiredFromRegularStock = itemQuantity - promoApplicableCount;
-
-        if (requiredFromRegularStock <= 0) {
-            return 0;
-        }
-
-        return calculateRegularStock(products, requiredFromRegularStock);
-    }
-
     private boolean hasProduct(String productName) {
         if (!inventory.containsKey(productName)) {
             throw new IllegalArgumentException(ErrorMessage.ITEM_NOT_EXIST.getMessage());
@@ -70,7 +66,13 @@ public class ProductInventory {
         return true;
     }
 
-    // 프로모션 재고 수량 계산
+    public boolean checkPromotionStock(Item item) {
+        List<Product> products = inventory.get(item.getName());
+        int totalPromotionStock = calculatePromotionStock(products);
+
+        return totalPromotionStock >= item.getQuantity();
+    }
+
     private int calculatePromotionStock(List<Product> products) {
         return products.stream()
                 .filter(Product::isPromotion)
@@ -78,8 +80,18 @@ public class ProductInventory {
                 .sum();
     }
 
+    // 일반 재고로 구매해야 하는 수량 계산
+    public int calculateRequiredRegularStock(String itemName, int itemQuantity, Promotion promotion) {
+        List<Product> products = inventory.get(itemName);
+        int promotionStock = calculatePromotionStock(products);
+        int promotionCount = calculatePromotionCount(itemQuantity, promotionStock, promotion);
+        int requiredRegularStock = itemQuantity - promotionCount;
+
+        return checkRequiredRegularStock(products, requiredRegularStock);
+    }
+
     // 프로모션 적용 가능한 수량 계산
-    private int calculatePromoApplicableCount(int itemQuantity, int promotionStock, Promotion promotion) {
+    private int calculatePromotionCount(int itemQuantity, int promotionStock, Promotion promotion) {
         int buyQuantity = promotion.getBuyQuantity();
         int getQuantity = promotion.getGetQuantity();
 
@@ -87,41 +99,29 @@ public class ProductInventory {
         return Math.min(promoUnits, itemQuantity);
     }
 
-    // 일반 재고 수량 계산
-    public int calculateRegularStock(List<Product> products, int requiredFromRegularStock) {
-        int regularStock = products.stream()
-                .filter(product -> !product.isPromotion())
-                .mapToInt(Product::getQuantity)
-                .sum();
-
-        if (regularStock >= requiredFromRegularStock) {
-            return requiredFromRegularStock;
+    public int checkRequiredRegularStock(List<Product> products, int requiredRegularStock) {
+        int regularStock = calculateRegularStock(products);
+        if (regularStock >= requiredRegularStock) {
+            return requiredRegularStock;
         }
         throw new IllegalArgumentException(ErrorMessage.QUANTITY_EXCEEDS_STOCK.getMessage());
-    }
-
-    // 일반 재고가 있는지 확인
-    private boolean hasRegularStock(List<Product> products) {
-        return products.stream().anyMatch(product -> !product.isPromotion());
-    }
-
-    // 재고 부족 시 일반 재고 추가
-    private void addMissingRegularStock(List<Product> products) {
-        int productPrice = products.getFirst().getPrice();
-        products.add(new Product(products.getFirst().getName(), productPrice, 0, "null"));
     }
 
     public void checkRegularStock(Item item) {
         List<Product> products = inventory.get(item.getName());
 
-        int regularStock = products.stream()
-                .filter(product -> !product.isPromotion())
-                .mapToInt(Product::getQuantity)
-                .sum();
+        int regularStock = calculateRegularStock(products);
 
         if (regularStock < item.getQuantity()) {
             throw new IllegalArgumentException(ErrorMessage.QUANTITY_EXCEEDS_STOCK.getMessage());
         }
+    }
+
+    private int calculateRegularStock(List<Product> products) {
+        return products.stream()
+                .filter(product -> !product.isPromotion())
+                .mapToInt(Product::getQuantity)
+                .sum();
     }
 
     public void decreaseRegularProductQuantity(String productName, int quantity) {

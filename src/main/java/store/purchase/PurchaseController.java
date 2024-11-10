@@ -1,4 +1,4 @@
-package store;
+package store.purchase;
 
 import java.util.List;
 import store.console.InputHandler;
@@ -8,9 +8,7 @@ import store.console.OutputView;
 import store.loader.ProductLoader;
 import store.loader.PromotionLoader;
 import store.product.ProductInventory;
-import store.promotion.PromotionHandler;
-import store.user.Item;
-import store.user.UserCart;
+import store.user.UserPurchaseHandler;
 
 public class PurchaseController {
     private final ProductLoader productLoader;
@@ -46,19 +44,19 @@ public class PurchaseController {
     }
 
     private void processPurchase(ProductInventory productInventory, InputHandler inputHandler) {
-        UserCart userCart = new UserCart();
+        UserPurchaseHandler UserPurchaseHandler = new UserPurchaseHandler();
 
         outputView.printProducts(productInventory);
         List<Item> items = inputHandler.getValidatedItems();
-        PromotionHandler promotionHandler = new PromotionHandler(promotionLoader.getInformation(), userCart,
-                inputHandler);
+        PurchaseHandler promotionHandler = new PurchaseHandler(promotionLoader.getInformation(), UserPurchaseHandler,
+                inputHandler, productInventory);
 
-        promotionHandler.applyPromotions(productInventory, items);
+        promotionHandler.handlePurchase(items);
 
         if (inputHandler.askToMembershipDiscount()) {
-            userCart.calculateMembershipDiscount();
+            UserPurchaseHandler.calculateMembershipDiscount();
         }
 
-        outputView.printReceipt(userCart);
+        outputView.printReceipt(UserPurchaseHandler);
     }
 }
