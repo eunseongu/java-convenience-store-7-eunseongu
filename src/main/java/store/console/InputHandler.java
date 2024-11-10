@@ -2,6 +2,8 @@ package store.console;
 
 import java.util.ArrayList;
 import java.util.List;
+import store.product.ProductInventory;
+import store.promotion.Promotion;
 import store.user.ItemToPurchase;
 import store.util.ErrorMessage;
 
@@ -33,7 +35,6 @@ public class InputHandler {
         for (String item : items) {
             inputValidator.validateItemFormat(item);
             ItemToPurchase parsedItem = parseItemDetails(item);
-//            inputValidator.validateItemStock(parsedItem);
             parsedItems.add(parsedItem);
         }
 
@@ -68,9 +69,35 @@ public class InputHandler {
         return itemQuantity;
     }
 
-    public boolean applyMembership() {
+    public boolean askToMembershipDiscount() {
         while (true) {
             String response = InputView.askToApplyMembershipDiscount();
+            try {
+                inputValidator.validateResponse(response);
+                return response.equalsIgnoreCase("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public boolean askToAddBonus(ItemToPurchase item) {
+        while (true) {
+            String response = InputView.askToAddBonusItem(item.getName());
+            try {
+                inputValidator.validateResponse(response);
+                return response.equalsIgnoreCase("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+
+    public boolean askToPurchaseWithoutPromotion(ItemToPurchase item, ProductInventory inventory,
+                                                 int requiredRegularQuantity, Promotion promotion, boolean withBonus) {
+        while (true) {
+            String response = InputView.askToPurchaseWithoutPromotion(item.getName(), requiredRegularQuantity);
             try {
                 inputValidator.validateResponse(response);
                 return response.equalsIgnoreCase("Y");

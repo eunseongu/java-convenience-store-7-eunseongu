@@ -142,20 +142,6 @@ public class ProductInventory {
         }
     }
 
-    public boolean hasSufficientStock(ItemToPurchase item) {
-        if (!inventory.containsKey(item.getName())) {
-            throw new IllegalArgumentException(ErrorMessage.ITEM_NOT_EXIST.getMessage());
-        }
-
-        List<Product> products = inventory.get(item.getName());
-        int availableStock = products.stream()
-                .filter(product -> !product.isPromotion())
-                .mapToInt(Product::getQuantity)
-                .sum();
-
-        return availableStock >= item.getQuantity();
-    }
-
     public void printProducts() {
         for (List<Product> products : inventory.values()) {
             for (Product product : products) {

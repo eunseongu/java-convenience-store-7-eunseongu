@@ -67,7 +67,11 @@ public class UserCart {
     }
 
     public int calculateCombinedQuantity() {
-        return combinedPurchases.size();
+        int totalQuantity = 0;
+        for (PurchasedItem item : combinedPurchases.values()) {
+            totalQuantity += item.getQuantity();
+        }
+        return totalQuantity;
     }
 
     private void combinePurchases(Map<String, PurchasedItem> purchases, Map<String, PurchasedItem> combinedQuantities) {
@@ -112,7 +116,7 @@ public class UserCart {
 
     public int calculateMembershipDiscount() {
         for (PurchasedItem item : regularPurchases.values()) {
-            this.membershipDiscountPrice += item.getTotalPrice() * 0.7;
+            this.membershipDiscountPrice += item.getTotalPrice() * 0.3;
         }
 
         if (this.membershipDiscountPrice > 8000) {

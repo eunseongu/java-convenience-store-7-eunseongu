@@ -11,7 +11,7 @@ public class OutputView {
         productInventory.printProducts();
     }
 
-    public void PrintReceipt(UserCart userCart) {
+    public void printReceipt(UserCart userCart) {
         System.out.println("===========W 편의점=============");
         System.out.println("상품명\t\t수량\t금액");
         userCart.printCombinedPurchases();
