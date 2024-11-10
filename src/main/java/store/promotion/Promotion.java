@@ -32,14 +32,6 @@ public class Promotion {
         return getQuantity;
     }
 
-    public boolean validate(Item item) {
-//        if (isPromotionActive() && canReceiveBonus(item)) {
-        if (isPromotionActive()) {
-            return true;
-        }
-        return false;
-    }
-
     public boolean canReceiveBonus(Item item) {
         int BuyNGet1Free = this.buyQuantity + this.getQuantity;
         int purchaseQuantity = item.getQuantity();
@@ -47,7 +39,7 @@ public class Promotion {
         return purchaseQuantity % BuyNGet1Free == this.buyQuantity;
     }
 
-    private boolean isPromotionActive() {
+    public boolean isPromotionActive(Item item) {
         LocalDate now = DateTimes.now().toLocalDate();
 
         return (now.isAfter(startDate) || now.isEqual(startDate)) && now.isBefore(endDate);

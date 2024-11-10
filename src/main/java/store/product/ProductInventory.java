@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import store.promotion.Promotion;
-import store.user.Item;
 import store.util.ErrorMessage;
 
 public class ProductInventory {
@@ -50,10 +49,7 @@ public class ProductInventory {
     }
 
     // 일반 재고 수량 계산
-    public int getRequiredRegularStock(Item item, Promotion promotion) {
-        String itemName = item.getName();
-        int itemQuantity = item.getQuantity();
-
+    public int getRequiredRegularStock(String itemName, int itemQuantity, Promotion promotion) {
         List<Product> products = inventory.get(itemName);
         int promotionStock = calculatePromotionStock(products);
         int promoApplicableCount = calculatePromoApplicableCount(itemQuantity, promotionStock, promotion);

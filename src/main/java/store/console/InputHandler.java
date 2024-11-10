@@ -6,6 +6,8 @@ import store.user.Item;
 import store.util.ErrorMessage;
 
 public class InputHandler {
+    private InputValidator inputValidator = new InputValidator();
+
     public List<Item> getValidatedItems() {
         List<Item> items = null;
         while (items == null) {
@@ -20,12 +22,12 @@ public class InputHandler {
     }
 
     public List<Item> parseItemInput(String itemInput) {
-        validateItemInput(itemInput);
+        inputValidator.validateItemInput(itemInput);
         List<String> items = List.of(itemInput.split(","));
         List<Item> parsedItems = new ArrayList<>();
 
         for (String item : items) {
-            validateItemFormat(item);
+            inputValidator.validateItemFormat(item);
             Item parsedItem = parseItemDetails(item);
             parsedItems.add(parsedItem);
         }
@@ -33,24 +35,11 @@ public class InputHandler {
         return parsedItems;
     }
 
-
-    private void validateItemFormat(String item) {
-        if (!item.startsWith("[") || !item.endsWith("]")) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
-        }
-        if (item.chars().filter(ch -> ch == '[').count() != 1 || item.chars().filter(ch -> ch == ']').count() != 1) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
-        }
-        if (!item.contains("-") || item.indexOf('-') != item.lastIndexOf('-')) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
-        }
-    }
-
     private Item parseItemDetails(String item) {
         List<String> itemDetails = List.of(item.replace("[", "").replace("]", "").split("-"));
 
         String itemName = itemDetails.get(0);
-        validateItemName(itemName);
+        inputValidator.validateItemName(itemName);
 
         if (itemDetails.size() == 1 || itemDetails.get(1).isEmpty()) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
@@ -60,14 +49,6 @@ public class InputHandler {
         return new Item(itemName, itemQuantity);
     }
 
-    private void validateItemName(String itemName) {
-        if (itemName.isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
-        }
-        if (itemName.chars().filter(ch -> ch == '-').count() > 1) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
-        }
-    }
 
     private int parseItemQuantity(List<String> itemDetails) {
         int itemQuantity;
@@ -77,20 +58,10 @@ public class InputHandler {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
-        validateItemQuantity(itemQuantity);
+        inputValidator.validateItemQuantity(itemQuantity);
 
         return itemQuantity;
     }
 
-    private void validateItemQuantity(int itemQuantity) {
-        if (itemQuantity <= 0) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
-        }
-    }
 
-    private void validateItemInput(String itemInput) {
-        if (itemInput == null || itemInput.isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
-        }
-    }
 }

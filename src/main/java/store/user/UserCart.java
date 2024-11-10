@@ -34,8 +34,6 @@ public class UserCart {
                 return existingItem;
             }
         });
-//        System.out.println("프로모션" + productName + quantity + price);
-
     }
 
     public void addFreePurchase(String productName, int quantity) {
@@ -47,7 +45,37 @@ public class UserCart {
                 return existingItem;
             }
         });
-//        System.out.println("증정" + productName + quantity);
+    }
 
+    public void printCombinedPurchases() {
+        Map<String, PurchaseItem> combinedQuantities = new HashMap<>();
+
+        combinePurchases(regularPurchases, combinedQuantities);
+        combinePurchases(promotionPurchases, combinedQuantities);
+        combinePurchases(freePurchases, combinedQuantities);
+
+        for (PurchaseItem item : combinedQuantities.values()) {
+            item.printItem();
+        }
+    }
+
+    private void combinePurchases(Map<String, PurchaseItem> purchases, Map<String, PurchaseItem> combinedQuantities) {
+        for (Map.Entry<String, PurchaseItem> entry : purchases.entrySet()) {
+            String productName = entry.getKey();
+            int quantity = entry.getValue().getQuantity();
+
+            if (combinedQuantities.containsKey(productName)) {
+                PurchaseItem existingItem = combinedQuantities.get(productName);
+                existingItem.increaseQuantity(quantity);
+            } else {
+                combinedQuantities.put(productName, entry.getValue());
+            }
+        }
+    }
+
+    public void printFreePurchases() {
+        for (PurchaseItem item : freePurchases.values()) {
+            item.printItem();
+        }
     }
 }

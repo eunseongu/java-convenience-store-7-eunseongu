@@ -2,6 +2,7 @@ package store;
 
 import java.util.List;
 import store.console.InputHandler;
+import store.console.InputValidator;
 import store.console.InputView;
 import store.console.OutputView;
 import store.loader.ProductLoader;
@@ -18,24 +19,37 @@ public class PurchaseController {
     OutputView outputView = new OutputView();
     InputHandler inputHandler = new InputHandler();
     UserCart userCart = new UserCart();
+    InputValidator inputValidator = new InputValidator();
 
     public PurchaseController() {
-        this.promotionHandler = new PromotionHandler(promotionLoader.getInformation(), userCart, new InputView());
     }
 
     public void run() {
         ProductInventory productInventory = productLoader.getInventory();
+        outputView.printProducts(productInventory);
+
+        List<Item> items = inputHandler.getValidatedItems();
+        promotionHandler = new PromotionHandler(promotionLoader.getInformation(), userCart, new InputView());
+        promotionHandler.applyPromotions(productInventory, items);
+        outputView.PrintReceipt(userCart);
 
         while (true) {
-            outputView.printProducts(productInventory);
-
-            List<Item> items = inputHandler.getValidatedItems();
-
-            promotionHandler.applyPromotions(productInventory, items);
-
             String response = InputView.askToPurchaseMoreItem();
-            if ("N".equalsIgnoreCase(response)) {
-                break;
+
+            try {
+                inputValidator.validateResponse(response);
+                if ("N".equalsIgnoreCase(response)) {
+                    break;
+                }
+                userCart = new UserCart();
+                outputView.printProducts(productInventory);
+                items = inputHandler.getValidatedItems();
+                promotionHandler = new PromotionHandler(promotionLoader.getInformation(), userCart, new InputView());
+                promotionHandler.applyPromotions(productInventory, items);
+                outputView.PrintReceipt(userCart);
+
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
             }
         }
     }

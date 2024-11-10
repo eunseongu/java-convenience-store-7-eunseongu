@@ -16,7 +16,7 @@ public class PromotionManager {
     public boolean validatePromotion(String promotionName, Item item) {
         Promotion promotion = promotions.get(promotionName);
 
-        return promotion.validate(item);
+        return promotion.isPromotionActive(item);
     }
 
     public Promotion getPromotion(String promotionType) {
