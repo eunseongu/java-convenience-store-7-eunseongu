@@ -1,4 +1,4 @@
-package store;
+package store.user;
 
 public class PurchaseItem {
     private String name;

@@ -1,4 +1,4 @@
-package store;
+package store.product;
 
 public class Product {
     private String name;
@@ -25,8 +25,16 @@ public class Product {
         return promotion;
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
     public boolean isPromotion() {
         return promotion != null && !promotion.equals("null") && !promotion.isEmpty();
+    }
+
+    public void decreaseQuantity(int quantity) {
+        this.quantity -= quantity;
     }
 
     @Override

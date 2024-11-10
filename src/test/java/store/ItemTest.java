@@ -3,6 +3,8 @@ package store;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
+import store.console.InputHandler;
+import store.util.ErrorMessage;
 
 
 class ItemTest {

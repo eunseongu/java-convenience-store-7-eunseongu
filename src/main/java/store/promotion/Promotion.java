@@ -1,8 +1,9 @@
-package store;
+package store.promotion;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import store.user.Item;
 
 public class Promotion {
     private String name;
@@ -23,14 +24,23 @@ public class Promotion {
         return name;
     }
 
+    public int getBuyQuantity() {
+        return buyQuantity;
+    }
+
+    public int getGetQuantity() {
+        return getQuantity;
+    }
+
     public boolean validate(Item item) {
-        if (isPromotionActive() && canReceiveBonus(item)) {
+//        if (isPromotionActive() && canReceiveBonus(item)) {
+        if (isPromotionActive()) {
             return true;
         }
         return false;
     }
 
-    private boolean canReceiveBonus(Item item) {
+    public boolean canReceiveBonus(Item item) {
         int BuyNGet1Free = this.buyQuantity + this.getQuantity;
         int purchaseQuantity = item.getQuantity();
 

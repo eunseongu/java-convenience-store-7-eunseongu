@@ -1,10 +1,12 @@
-package store;
+package store.loader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import store.product.Product;
+import store.product.ProductInventory;
 
 public class ProductLoader {
     private final int REQUIRED_FIELDS_COUNT = 4;

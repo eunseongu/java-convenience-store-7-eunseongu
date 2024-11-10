@@ -1,7 +1,8 @@
-package store;
+package store.promotion;
 
 import java.util.HashMap;
 import java.util.Map;
+import store.user.Item;
 
 public class PromotionManager {
     private Map<String, Promotion> promotions = new HashMap<>();
@@ -12,11 +13,13 @@ public class PromotionManager {
         promotions.put(name, promotion);
     }
 
-    public boolean validate(String promotionType, Item item) {
-        Promotion promotion = promotions.get(promotionType);
-        if (promotion == null) {
-            throw new IllegalArgumentException("Promotion type not found");
-        }
+    public boolean validatePromotion(String promotionName, Item item) {
+        Promotion promotion = promotions.get(promotionName);
+
         return promotion.validate(item);
+    }
+
+    public Promotion getPromotion(String promotionType) {
+        return promotions.get(promotionType);
     }
 }

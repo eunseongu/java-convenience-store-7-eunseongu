@@ -1,4 +1,4 @@
-package store;
+package store.user;
 
 public class Item {
     private String name;
@@ -17,11 +17,11 @@ public class Item {
         return quantity;
     }
 
-    public Integer getPrice(ProductInventory productInventory) {
-        return productInventory.getProductPriceByName(name);
-    }
-
-    public String getPromotionType(ProductInventory productInventory) {
-        return productInventory.isPromotionalItem(name);
-    }
+//    public Integer getPrice(ProductInventory productInventory) {
+//        return productInventory.getProductPriceByName(name);
+//    }
+//
+//    public String getPromotionType(ProductInventory productInventory) {
+//        return productInventory.isPromotionalItem(name);
+//    }
 }

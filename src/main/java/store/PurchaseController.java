@@ -1,6 +1,15 @@
 package store;
 
 import java.util.List;
+import store.console.InputHandler;
+import store.console.InputView;
+import store.console.OutputView;
+import store.loader.ProductLoader;
+import store.loader.PromotionLoader;
+import store.product.ProductInventory;
+import store.promotion.PromotionHandler;
+import store.user.Item;
+import store.user.UserCart;
 
 public class PurchaseController {
     PromotionHandler promotionHandler;
@@ -17,10 +26,17 @@ public class PurchaseController {
     public void run() {
         ProductInventory productInventory = productLoader.getInventory();
 
-        outputView.printProducts(productInventory);
+        while (true) {
+            outputView.printProducts(productInventory);
 
-        List<Item> items = inputHandler.getValidatedItems();
+            List<Item> items = inputHandler.getValidatedItems();
 
-        promotionHandler.handlePromotions(productInventory, items);
+            promotionHandler.applyPromotions(productInventory, items);
+
+            String response = InputView.askToPurchaseMoreItem();
+            if ("N".equalsIgnoreCase(response)) {
+                break;
+            }
+        }
     }
 }

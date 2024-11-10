@@ -1,7 +1,9 @@
-package store;
+package store.console;
 
 import java.util.ArrayList;
 import java.util.List;
+import store.user.Item;
+import store.util.ErrorMessage;
 
 public class InputHandler {
     public List<Item> getValidatedItems() {

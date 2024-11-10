@@ -1,4 +1,6 @@
-package store;
+package store.console;
+
+import store.product.ProductInventory;
 
 public class OutputView {
     public void printProducts(ProductInventory productInventory) {
