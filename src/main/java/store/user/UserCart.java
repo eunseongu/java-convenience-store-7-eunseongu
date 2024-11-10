@@ -56,7 +56,6 @@ public class UserCart {
     }
 
     public void printCombinedPurchases() {
-
         combinePurchases(regularPurchases, combinedPurchases);
         combinePurchases(promotionPurchases, combinedPurchases);
         combinePurchases(freePurchases, combinedPurchases);
@@ -64,14 +63,6 @@ public class UserCart {
         for (PurchasedItem item : combinedPurchases.values()) {
             item.printItem();
         }
-    }
-
-    public int calculateCombinedQuantity() {
-        int totalQuantity = 0;
-        for (PurchasedItem item : combinedPurchases.values()) {
-            totalQuantity += item.getQuantity();
-        }
-        return totalQuantity;
     }
 
     private void combinePurchases(Map<String, PurchasedItem> purchases, Map<String, PurchasedItem> combinedQuantities) {
@@ -86,6 +77,14 @@ public class UserCart {
                 combinedQuantities.put(productName, entry.getValue());
             }
         }
+    }
+
+    public int calculateCombinedQuantity() {
+        int totalQuantity = 0;
+        for (PurchasedItem item : combinedPurchases.values()) {
+            totalQuantity += item.getQuantity();
+        }
+        return totalQuantity;
     }
 
     public void printFreePurchases() {

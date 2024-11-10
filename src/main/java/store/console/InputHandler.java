@@ -2,9 +2,7 @@ package store.console;
 
 import java.util.ArrayList;
 import java.util.List;
-import store.product.ProductInventory;
-import store.promotion.Promotion;
-import store.user.ItemToPurchase;
+import store.user.Item;
 import store.util.ErrorMessage;
 
 public class InputHandler {
@@ -14,8 +12,8 @@ public class InputHandler {
         this.inputValidator = inputValidator;
     }
 
-    public List<ItemToPurchase> getValidatedItems() {
-        List<ItemToPurchase> items = null;
+    public List<Item> getValidatedItems() {
+        List<Item> items = null;
         while (items == null) {
             try {
                 String itemInput = InputView.readItem();
@@ -27,21 +25,57 @@ public class InputHandler {
         return items;
     }
 
-    public List<ItemToPurchase> parseItemInput(String itemInput) {
+    public boolean askToMembershipDiscount() {
+        while (true) {
+            String response = InputView.askToApplyMembershipDiscount();
+            try {
+                inputValidator.validateResponse(response);
+                return response.equalsIgnoreCase("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public boolean askToAddFreeItem(Item item) {
+        while (true) {
+            String response = InputView.askToAddFreeItem(item.getName());
+            try {
+                inputValidator.validateResponse(response);
+                return response.equalsIgnoreCase("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public boolean askToPurchaseWithoutPromotion(Item item, int requiredRegularQuantity) {
+        while (true) {
+            String response = InputView.askToPurchaseWithoutPromotion(item.getName(), requiredRegularQuantity);
+            try {
+                inputValidator.validateResponse(response);
+                return response.equalsIgnoreCase("Y");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private List<Item> parseItemInput(String itemInput) {
         inputValidator.validateItemInput(itemInput);
         List<String> items = List.of(itemInput.split(","));
-        List<ItemToPurchase> parsedItems = new ArrayList<>();
+        List<Item> parsedItems = new ArrayList<>();
 
         for (String item : items) {
             inputValidator.validateItemFormat(item);
-            ItemToPurchase parsedItem = parseItemDetails(item);
+            Item parsedItem = parseItemDetails(item);
             parsedItems.add(parsedItem);
         }
 
         return parsedItems;
     }
 
-    private ItemToPurchase parseItemDetails(String item) {
+    private Item parseItemDetails(String item) {
         List<String> itemDetails = List.of(item.replace("[", "").replace("]", "").split("-"));
 
         String itemName = itemDetails.get(0);
@@ -52,7 +86,7 @@ public class InputHandler {
         }
         int itemQuantity = parseItemQuantity(itemDetails);
 
-        return new ItemToPurchase(itemName, itemQuantity);
+        return new Item(itemName, itemQuantity);
     }
 
 
@@ -69,41 +103,4 @@ public class InputHandler {
         return itemQuantity;
     }
 
-    public boolean askToMembershipDiscount() {
-        while (true) {
-            String response = InputView.askToApplyMembershipDiscount();
-            try {
-                inputValidator.validateResponse(response);
-                return response.equalsIgnoreCase("Y");
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-
-    public boolean askToAddBonus(ItemToPurchase item) {
-        while (true) {
-            String response = InputView.askToAddBonusItem(item.getName());
-            try {
-                inputValidator.validateResponse(response);
-                return response.equalsIgnoreCase("Y");
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-
-
-    public boolean askToPurchaseWithoutPromotion(ItemToPurchase item, ProductInventory inventory,
-                                                 int requiredRegularQuantity, Promotion promotion, boolean withBonus) {
-        while (true) {
-            String response = InputView.askToPurchaseWithoutPromotion(item.getName(), requiredRegularQuantity);
-            try {
-                inputValidator.validateResponse(response);
-                return response.equalsIgnoreCase("Y");
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
 }

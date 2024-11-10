@@ -10,8 +10,7 @@ import store.promotion.PromotionManager;
 
 public class PromotionLoader {
     private final int REQUIRED_FIELDS_COUNT = 5;
-    private PromotionManager promotionManager = new PromotionManager();
-//    List<Promotion> promotionInfo = new ArrayList<Promotion>();
+    private final PromotionManager promotionManager = new PromotionManager();
 
     public PromotionLoader() {
         loadPromotions();

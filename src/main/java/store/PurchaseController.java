@@ -9,7 +9,7 @@ import store.loader.ProductLoader;
 import store.loader.PromotionLoader;
 import store.product.ProductInventory;
 import store.promotion.PromotionHandler;
-import store.user.ItemToPurchase;
+import store.user.Item;
 import store.user.UserCart;
 
 public class PurchaseController {
@@ -25,7 +25,7 @@ public class PurchaseController {
 
     public void run() {
         ProductInventory productInventory = productLoader.getInventory();
-        InputValidator inputValidator = new InputValidator(productInventory);
+        InputValidator inputValidator = new InputValidator();
         InputHandler inputHandler = new InputHandler(inputValidator);
 
         processPurchase(productInventory, inputHandler);
@@ -49,7 +49,7 @@ public class PurchaseController {
         UserCart userCart = new UserCart();
 
         outputView.printProducts(productInventory);
-        List<ItemToPurchase> items = inputHandler.getValidatedItems();
+        List<Item> items = inputHandler.getValidatedItems();
         PromotionHandler promotionHandler = new PromotionHandler(promotionLoader.getInformation(), userCart,
                 inputHandler);
 

@@ -1,16 +1,8 @@
 package store.console;
 
-import store.product.ProductInventory;
-import store.user.ItemToPurchase;
 import store.util.ErrorMessage;
 
 public class InputValidator {
-    private ProductInventory productInventory;
-
-    public InputValidator(ProductInventory productInventory) {
-        this.productInventory = productInventory;
-    }
-
     public void validateItemFormat(String item) {
         if (!item.startsWith("[") || !item.endsWith("]")) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_FORMAT.getMessage());
@@ -48,9 +40,5 @@ public class InputValidator {
         if (!response.equalsIgnoreCase("Y") && !response.equalsIgnoreCase("N")) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
-    }
-
-    public void validateItemStock(ItemToPurchase item) {
-        productInventory.checkRegularStock(item);
     }
 }

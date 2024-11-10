@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import store.promotion.Promotion;
-import store.user.ItemToPurchase;
+import store.user.Item;
 import store.util.ErrorMessage;
 
 public class ProductInventory {
@@ -38,7 +38,7 @@ public class ProductInventory {
         }
     }
 
-    public String isPromotionalItem(String productName) {
+    public String getPromotionType(String productName) {
         if (hasProduct(productName)) {
             for (Product product : inventory.get(productName)) {
                 if (product.isPromotion()) {
@@ -111,7 +111,7 @@ public class ProductInventory {
         products.add(new Product(products.getFirst().getName(), productPrice, 0, "null"));
     }
 
-    public void checkRegularStock(ItemToPurchase item) {
+    public void checkRegularStock(Item item) {
         List<Product> products = inventory.get(item.getName());
 
         int regularStock = products.stream()

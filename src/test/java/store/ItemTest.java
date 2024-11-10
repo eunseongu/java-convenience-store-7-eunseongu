@@ -11,7 +11,7 @@ import store.util.ErrorMessage;
 
 class ItemTest {
     private final ProductInventory productInventory = new ProductInventory();
-    private final InputValidator inputValidator = new InputValidator(productInventory);
+    private final InputValidator inputValidator = new InputValidator();
     private final InputHandler inputHandler = new InputHandler(inputValidator);
 
     @Test

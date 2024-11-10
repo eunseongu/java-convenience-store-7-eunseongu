@@ -3,7 +3,7 @@ package store.promotion;
 import java.util.List;
 import store.console.InputHandler;
 import store.product.ProductInventory;
-import store.user.ItemToPurchase;
+import store.user.Item;
 import store.user.UserCart;
 
 public class PromotionHandler {
@@ -17,14 +17,14 @@ public class PromotionHandler {
         this.inputHandler = inputHandler;
     }
 
-    public void applyPromotions(ProductInventory inventory, List<ItemToPurchase> items) {
-        for (ItemToPurchase item : items) {
+    public void applyPromotions(ProductInventory inventory, List<Item> items) {
+        for (Item item : items) {
             handlePromotionForItem(item, inventory);
         }
     }
 
-    private void handlePromotionForItem(ItemToPurchase item, ProductInventory inventory) {
-        String promotionType = inventory.isPromotionalItem(item.getName());
+    private void handlePromotionForItem(Item item, ProductInventory inventory) {
+        String promotionType = inventory.getPromotionType(item.getName());
         if (promotionType == null) {
             handleRegularItem(item, inventory);
             return;
@@ -38,15 +38,15 @@ public class PromotionHandler {
         }
     }
 
-    private void applyPromotion(ItemToPurchase item, ProductInventory inventory, Promotion promotion) {
-        if (promotion.canReceiveBonus(item) && inputHandler.askToAddBonus(item)) {
+    private void applyPromotion(Item item, ProductInventory inventory, Promotion promotion) {
+        if (promotion.canReceiveBonus(item) && inputHandler.askToAddFreeItem(item)) {
             addItemsToCart(item, inventory, promotion, true);
         } else {
             addItemsToCart(item, inventory, promotion, false);
         }
     }
 
-    private void handleRegularItem(ItemToPurchase item, ProductInventory inventory) {
+    private void handleRegularItem(Item item, ProductInventory inventory) {
         try {
             inventory.checkRegularStock(item);
             addRegularItemToCart(item, item.getQuantity(), inventory);
@@ -55,7 +55,7 @@ public class PromotionHandler {
         }
     }
 
-    private void addItemsToCart(ItemToPurchase item, ProductInventory inventory, Promotion promotion,
+    private void addItemsToCart(Item item, ProductInventory inventory, Promotion promotion,
                                 boolean withBonus) {
         try {
             int requiredStock = inventory.getRequiredRegularStock(item.getName(),
@@ -70,21 +70,22 @@ public class PromotionHandler {
         }
     }
 
-    private void askToPurchaseWithoutPromotion(ItemToPurchase item, ProductInventory inventory, int requiredStock,
+    private void askToPurchaseWithoutPromotion(Item item, ProductInventory inventory, int requiredStock,
                                                Promotion promotion, boolean withBonus) {
-        if (inputHandler.askToPurchaseWithoutPromotion(item, inventory, requiredStock, promotion, withBonus)) {
+        if (inputHandler.askToPurchaseWithoutPromotion(item, requiredStock)) {
             addRegularItemToCart(item, requiredStock, inventory);
         }
         int remainingPromotionQuantity = item.getQuantity() - requiredStock;
         addPromotionItemToCartWithBonus(item, remainingPromotionQuantity + (withBonus ? 1 : 0), inventory, promotion);
     }
 
-    private void addPromotionItemToCartWithBonus(ItemToPurchase item, int totalQuantity, ProductInventory inventory,
+    private void addPromotionItemToCartWithBonus(Item item, int totalQuantity, ProductInventory inventory,
                                                  Promotion promotion) {
         String name = item.getName();
         Integer price = inventory.getProductPriceByName(name);
+
         if (price != null) {
-            int buyQuantity = (promotion.getBuyQuantity() == 1) ? totalQuantity / 2 : (totalQuantity / 3) * 2;
+            int buyQuantity = calculateBuyQuantity(totalQuantity, promotion);
             int getQuantity = totalQuantity - buyQuantity;
 
             userCart.addPromotionPurchase(name, buyQuantity, price);
@@ -93,7 +94,21 @@ public class PromotionHandler {
         }
     }
 
-    private void addRegularItemToCart(ItemToPurchase item, int qty, ProductInventory inventory) {
+    private int calculateBuyQuantity(int totalQuantity, Promotion promotion) {
+        int buyQuantity = 0;
+
+        if (promotion.getBuyQuantity() == 1) {
+            buyQuantity = totalQuantity / 2;
+        }
+
+        if (promotion.getBuyQuantity() == 2) {
+            buyQuantity = (totalQuantity / 3) * 2;
+        }
+
+        return buyQuantity;
+    }
+
+    private void addRegularItemToCart(Item item, int qty, ProductInventory inventory) {
         String name = item.getName();
         Integer price = inventory.getProductPriceByName(name);
         if (price != null) {

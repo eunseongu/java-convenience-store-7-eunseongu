@@ -2,7 +2,7 @@ package store.promotion;
 
 import java.util.HashMap;
 import java.util.Map;
-import store.user.ItemToPurchase;
+import store.user.Item;
 
 public class PromotionManager {
     private Map<String, Promotion> promotions = new HashMap<>();
@@ -13,10 +13,10 @@ public class PromotionManager {
         promotions.put(name, promotion);
     }
 
-    public boolean validatePromotion(String promotionName, ItemToPurchase item) {
+    public boolean validatePromotion(String promotionName, Item item) {
         Promotion promotion = promotions.get(promotionName);
 
-        return promotion.isPromotionActive(item);
+        return promotion.isPromotionActive();
     }
 
     public Promotion getPromotion(String promotionType) {

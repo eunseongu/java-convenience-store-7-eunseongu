@@ -3,7 +3,7 @@ package store.promotion;
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import store.user.ItemToPurchase;
+import store.user.Item;
 
 public class Promotion {
     private String name;
@@ -32,14 +32,14 @@ public class Promotion {
         return getQuantity;
     }
 
-    public boolean canReceiveBonus(ItemToPurchase item) {
+    public boolean canReceiveBonus(Item item) {
         int BuyNGet1Free = this.buyQuantity + this.getQuantity;
         int purchaseQuantity = item.getQuantity();
 
         return purchaseQuantity % BuyNGet1Free == this.buyQuantity;
     }
 
-    public boolean isPromotionActive(ItemToPurchase item) {
+    public boolean isPromotionActive() {
         LocalDate now = DateTimes.now().toLocalDate();
         return (now.isAfter(startDate) || now.isEqual(startDate)) && now.isBefore(endDate);
     }
