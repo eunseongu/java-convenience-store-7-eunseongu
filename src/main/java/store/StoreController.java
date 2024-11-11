@@ -24,11 +24,11 @@ public class StoreController {
     }
 
     public void run() {
-        InventoryManager productInventory = productLoader.getInventory();
+        InventoryManager inventoryManager = productLoader.getInventory();
         InputValidator inputValidator = new InputValidator();
         InputHandler inputHandler = new InputHandler(inputValidator);
 
-        processPurchase(productInventory, inputHandler);
+        processPurchase(inventoryManager, inputHandler);
 
         while (true) {
             String response = InputView.askToPurchaseMoreItem();
@@ -38,7 +38,7 @@ public class StoreController {
                 if ("N".equalsIgnoreCase(response)) {
                     break;
                 }
-                processPurchase(productInventory, inputHandler);
+                processPurchase(inventoryManager, inputHandler);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
