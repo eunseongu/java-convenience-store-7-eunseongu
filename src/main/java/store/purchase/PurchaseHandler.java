@@ -3,23 +3,23 @@ package store.purchase;
 import java.util.List;
 import store.console.InputHandler;
 import store.customer.PurchasedItemHandler;
-import store.product.storeInventory;
+import store.product.InventoryManager;
 import store.promotion.Promotion;
-import store.promotion.PromotionCatalog;
+import store.promotion.PromotionManager;
 
 public class PurchaseHandler {
-    private final PromotionCatalog promotionCatalog;
+    private final PromotionManager promotionManager;
     private final PurchasedItemHandler purchasedItemHandler;
     private final InputHandler inputHandler;
-    private final storeInventory storeInventory;
+    private final InventoryManager inventoryManager;
 
-    public PurchaseHandler(PromotionCatalog promotionCatalog, PurchasedItemHandler purchasedItemHandler,
+    public PurchaseHandler(PromotionManager promotionManager, PurchasedItemHandler purchasedItemHandler,
                            InputHandler inputHandler,
-                           storeInventory storeInventory) {
-        this.promotionCatalog = promotionCatalog;
+                           InventoryManager inventoryManager) {
+        this.promotionManager = promotionManager;
         this.purchasedItemHandler = purchasedItemHandler;
         this.inputHandler = inputHandler;
-        this.storeInventory = storeInventory;
+        this.inventoryManager = inventoryManager;
     }
 
     public void handlePurchase(List<Item> items) {
@@ -30,9 +30,9 @@ public class PurchaseHandler {
 
     private void processPurchase(Item item) {
         // 구매하려는 상품의 프로모션 종류를 product 목록에서 찾는다.
-        String promotionType = storeInventory.getPromotionType(item.getName());
+        String promotionType = inventoryManager.getPromotionType(item.getName());
         // 프로모션 종류에 대한 정보를 가져온다.
-        Promotion promotion = promotionCatalog.getPromotion(promotionType);
+        Promotion promotion = promotionManager.getPromotion(promotionType);
 
         if (isRegularPurchase(promotionType, promotion)) {
             handleRegularPurchase(item);
@@ -44,12 +44,12 @@ public class PurchaseHandler {
 
     // 프로모션 상품이 아니거나 유효한 프로모션이 아니면 일반 상품으로 구매한다.
     private boolean isRegularPurchase(String promotionType, Promotion promotion) {
-        return promotionType == null || !promotionCatalog.isPromotionActive(promotion.getName());
+        return promotionType == null || !promotionManager.isPromotionActive(promotion.getName());
     }
 
     private void handleRegularPurchase(Item item) {
         try {
-            storeInventory.checkRegularStock(item.getName(), item.getQuantity());
+            inventoryManager.checkRegularStock(item.getName(), item.getQuantity());
             processRegularPurchase(item.getName(), item.getQuantity());
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -66,23 +66,23 @@ public class PurchaseHandler {
     }
 
     private void processRegularPurchase(String name, int quantity) {
-        Integer price = storeInventory.getProductPriceByName(name);
+        Integer price = inventoryManager.getProductPriceByName(name);
 
         if (price != null) {
             purchasedItemHandler.addRegularPurchase(name, quantity, price);
-            storeInventory.decreaseRegularProductQuantity(name, quantity);
+            inventoryManager.decreaseRegularProductQuantity(name, quantity);
         }
     }
 
     private void processPromotionPurchase(Item item, Promotion promotion, int freeItemQuantity) {
         try {
             // 프로모션 재고가 충분한지 체크
-            if (storeInventory.checkPromotionStock(item)) {
+            if (inventoryManager.checkPromotionStock(item)) {
                 // 프로모션 재고가 충분하다면 프로모션 상품으로만 구매
                 processPromotionPurchaseAndFreeItem(item.getName(), item.getQuantity() + freeItemQuantity, promotion);
                 return;
             }
-            int requiredRegularStock = storeInventory.calculateRequiredRegularStock(item.getName(),
+            int requiredRegularStock = inventoryManager.calculateRequiredRegularStock(item.getName(),
                     item.getQuantity() + freeItemQuantity, promotion);
             // 프로모션 재고가 부족하다면 일반 상품으로 구매할 것인지 확인
             askToPurchaseWithoutPromotion(item, requiredRegularStock, promotion, freeItemQuantity);
@@ -103,7 +103,7 @@ public class PurchaseHandler {
     }
 
     private void processPromotionPurchaseAndFreeItem(String name, int totalQuantity, Promotion promotion) {
-        Integer price = storeInventory.getProductPriceByName(name);
+        Integer price = inventoryManager.getProductPriceByName(name);
 
         if (price != null) {
             int promotionQuantity = calculatePromotionQuantity(totalQuantity, promotion);
@@ -111,7 +111,7 @@ public class PurchaseHandler {
 
             purchasedItemHandler.addPromotionPurchase(name, promotionQuantity, price);
             purchasedItemHandler.addFreePurchase(name, freeQuantity);
-            storeInventory.decreasePromotionProductQuantity(name, totalQuantity);
+            inventoryManager.decreasePromotionProductQuantity(name, totalQuantity);
         }
     }
 

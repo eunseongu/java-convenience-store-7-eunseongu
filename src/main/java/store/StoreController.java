@@ -8,7 +8,7 @@ import store.console.OutputView;
 import store.customer.PurchasedItemHandler;
 import store.loader.ProductLoader;
 import store.loader.PromotionLoader;
-import store.product.storeInventory;
+import store.product.InventoryManager;
 import store.purchase.Item;
 import store.purchase.PurchaseHandler;
 
@@ -16,46 +16,49 @@ public class StoreController {
     private final ProductLoader productLoader;
     private final PromotionLoader promotionLoader;
     private final OutputView outputView;
+    private final InputValidator inputValidator;
 
-    public StoreController(ProductLoader productLoader, PromotionLoader promotionLoader, OutputView outputView) {
+    public StoreController(ProductLoader productLoader, PromotionLoader promotionLoader, OutputView outputView,
+                           InputValidator inputValidator) {
         this.productLoader = productLoader;
         this.promotionLoader = promotionLoader;
         this.outputView = outputView;
+        this.inputValidator = inputValidator;
+
     }
 
     public void run() {
-        storeInventory storeInventory = productLoader.getInventory();
-        InputValidator inputValidator = new InputValidator();
+        InventoryManager inventoryManager = productLoader.getInventory();
         InputHandler inputHandler = new InputHandler(inputValidator);
 
-        handleCustomerPurchase(storeInventory, inputHandler);
+        processPurchases(inventoryManager, inputHandler);
+    }
 
-        while (true) {
-            String response = InputView.askToPurchaseMoreItem();
+    private void processPurchases(InventoryManager inventoryManager, InputHandler inputHandler) {
+        do {
+            handlePurchase(inventoryManager, inputHandler);
+        } while (askToPurchaseMoreItem());
+    }
 
-            try {
-                inputValidator.validateResponse(response);
-                if ("N".equalsIgnoreCase(response)) {
-                    break;
-                }
-                handleCustomerPurchase(storeInventory, inputHandler);
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
+    private boolean askToPurchaseMoreItem() {
+        String response = InputView.askToPurchaseMoreItem();
+        try {
+            inputValidator.validateResponse(response);
+            return "Y".equalsIgnoreCase(response);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return true;
         }
     }
 
-    private void handleCustomerPurchase(storeInventory productInventory, InputHandler inputHandler) {
+    private void handlePurchase(InventoryManager inventoryManager, InputHandler inputHandler) {
         PurchasedItemHandler purchasedItemHandler = new PurchasedItemHandler();
 
-        outputView.printProducts(productInventory);
+        outputView.printProducts(inventoryManager);
 
         List<Item> items = inputHandler.getValidatedItems();
 
-        PurchaseHandler purchaseHandler = new PurchaseHandler(promotionLoader.getInformation(),
-                purchasedItemHandler,
-                inputHandler, productInventory);
-        purchaseHandler.handlePurchase(items);
+        processItemPurchase(items, purchasedItemHandler, inventoryManager, inputHandler);
 
         if (inputHandler.askToMembershipDiscount()) {
             purchasedItemHandler.applyMembershipDiscount();
@@ -63,4 +66,15 @@ public class StoreController {
 
         outputView.printReceipt(purchasedItemHandler);
     }
+
+    private void processItemPurchase(List<Item> items, PurchasedItemHandler purchasedItemHandler,
+                                     InventoryManager inventoryManager, InputHandler inputHandler) {
+        PurchaseHandler purchaseHandler = new PurchaseHandler(
+                promotionLoader.getInformation(),
+                purchasedItemHandler,
+                inputHandler,
+                inventoryManager);
+        purchaseHandler.handlePurchase(items);
+    }
+
 }

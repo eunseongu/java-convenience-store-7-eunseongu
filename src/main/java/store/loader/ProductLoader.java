@@ -5,17 +5,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import store.product.InventoryManager;
 import store.product.Product;
-import store.product.storeInventory;
 
 public class ProductLoader {
-    storeInventory inventory = new storeInventory();
+    InventoryManager inventory = new InventoryManager();
 
     public ProductLoader() {
         loadProducts();
     }
 
-    public storeInventory getInventory() {
+    public InventoryManager getInventory() {
         return inventory;
     }
 

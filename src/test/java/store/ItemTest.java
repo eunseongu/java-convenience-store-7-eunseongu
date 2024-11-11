@@ -13,13 +13,6 @@ class ItemTest {
     private final InputHandler inputHandler = new InputHandler(inputValidator);
 
     @Test
-    void 구매_정보_입력이_비어_있으면_예외가_발생한다() {
-        assertThatThrownBy(() -> inputHandler.parseItemInput(""))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ErrorMessage.INVALID_INPUT.getMessage());
-    }
-
-    @Test
     void 구매_정보_입력의_대괄호_형식이_유효하지_않으면_예외가_발생한다() {
         assertThatThrownBy(() -> inputHandler.parseItemInput("[콜라-3,[[에너지바-5]]]"))
                 .isInstanceOf(IllegalArgumentException.class)

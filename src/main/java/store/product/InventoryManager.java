@@ -8,7 +8,7 @@ import store.promotion.Promotion;
 import store.purchase.Item;
 import store.util.ErrorMessage;
 
-public class storeInventory {
+public class InventoryManager {
     private final Map<String, List<Product>> inventory = new HashMap<>();
 
     public void addProduct(Product product) {

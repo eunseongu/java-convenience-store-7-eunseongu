@@ -1,5 +1,6 @@
 package store;
 
+import store.console.InputValidator;
 import store.console.OutputView;
 import store.loader.ProductLoader;
 import store.loader.PromotionLoader;
@@ -9,8 +10,9 @@ public class Application {
         ProductLoader productLoader = new ProductLoader();
         PromotionLoader promotionLoader = new PromotionLoader();
         OutputView outputView = new OutputView();
-
-        StoreController purchaseController = new StoreController(productLoader, promotionLoader, outputView);
+        InputValidator inputValidator = new InputValidator();
+        StoreController purchaseController = new StoreController(productLoader, promotionLoader, outputView,
+                inputValidator);
 
         purchaseController.run();
     }

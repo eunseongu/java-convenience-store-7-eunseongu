@@ -6,17 +6,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import store.promotion.Promotion;
-import store.promotion.PromotionCatalog;
+import store.promotion.PromotionManager;
 
 public class PromotionLoader {
-    private final PromotionCatalog promotionCatalog = new PromotionCatalog();
+    private final PromotionManager promotionManager = new PromotionManager();
 
     public PromotionLoader() {
         loadPromotions();
     }
 
-    public PromotionCatalog getInformation() {
-        return promotionCatalog;
+    public PromotionManager getInformation() {
+        return promotionManager;
     }
 
     private void loadPromotions() {
@@ -39,14 +39,14 @@ public class PromotionLoader {
         if (hasValidFieldCount(fields)) {
             Promotion promotion = createPromotionFromFields(fields);
             if (promotion != null) {
-                promotionCatalog.register(promotion);
+                promotionManager.register(promotion);
             }
         }
     }
 
     private boolean hasValidFieldCount(List<String> fields) {
         int REQUIRED_FIELDS_COUNT = 5;
-        
+
         return fields.size() == REQUIRED_FIELDS_COUNT;
     }
 

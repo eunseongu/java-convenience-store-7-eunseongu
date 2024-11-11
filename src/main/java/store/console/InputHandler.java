@@ -17,6 +17,7 @@ public class InputHandler {
         while (items == null) {
             try {
                 String itemInput = InputView.readItem();
+                inputValidator.validateItemInput(itemInput);
                 items = parseItemInput(itemInput);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -62,11 +63,12 @@ public class InputHandler {
     }
 
     public List<Item> parseItemInput(String itemInput) {
-        inputValidator.validateItemInput(itemInput);
         List<String> items = List.of(itemInput.split(","));
+        inputValidator.validateParsedItem(items);
         List<Item> parsedItems = new ArrayList<>();
 
         for (String item : items) {
+            item = item.trim();
             inputValidator.validateItemFormat(item);
             Item parsedItem = parseItemDetails(item);
             parsedItems.add(parsedItem);
@@ -76,12 +78,11 @@ public class InputHandler {
 
     private Item parseItemDetails(String item) {
         List<String> itemDetails = List.of(item.replace("[", "").replace("]", "").split("-"));
-        String itemName = itemDetails.getFirst();
+        inputValidator.validateItemDetails(itemDetails);
+
+        String itemName = itemDetails.getFirst().trim();
         inputValidator.validateItemName(itemName);
 
-        if (itemDetails.size() == 1 || itemDetails.get(1).isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
-        }
         int itemQuantity = parseItemQuantity(itemDetails);
 
         return new Item(itemName, itemQuantity);
@@ -91,7 +92,7 @@ public class InputHandler {
         int itemQuantity;
 
         try {
-            itemQuantity = Integer.parseInt(itemDetails.get(1));
+            itemQuantity = Integer.parseInt(itemDetails.get(1).trim());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
@@ -99,5 +100,4 @@ public class InputHandler {
 
         return itemQuantity;
     }
-
 }

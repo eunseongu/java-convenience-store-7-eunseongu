@@ -63,7 +63,7 @@ class ApplicationTest extends NsTest {
     @Test
     void 프로모션_상품_구매_후_멤버십_할인_적용() {
         assertSimpleTest(() -> {
-            run("[콜라-3],[에너지바-5]", "Y", "N");
+            run("[콜라-3],[에너지바-5] ", "Y", "N");
             assertThat(output().replaceAll("\\s", ""))
                     .contains("총구매액813,000", "행사할인-1,000", "멤버십할인-3,000", "내실돈9,000");
         });
@@ -82,6 +82,7 @@ class ApplicationTest extends NsTest {
                             "총구매액23,600", "행사할인-1,800", "멤버십할인-0", "내실돈1,800");
         });
     }
+
 
     @Override
     public void runMain() {

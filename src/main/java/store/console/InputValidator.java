@@ -1,5 +1,6 @@
 package store.console;
 
+import java.util.List;
 import store.util.ErrorMessage;
 
 public class InputValidator {
@@ -24,14 +25,29 @@ public class InputValidator {
         }
     }
 
-    public void validateItemQuantity(int itemQuantity) {
-        if (itemQuantity <= 0) {
+    public void validateItemInput(String itemInput) {
+        if (itemInput == null || itemInput.isEmpty()) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
     }
 
-    public void validateItemInput(String itemInput) {
-        if (itemInput == null || itemInput.isEmpty()) {
+    public void validateParsedItem(List<String> parsedItem) {
+        if (parsedItem == null || parsedItem.isEmpty()) {
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
+        }
+    }
+
+    public void validateItemDetails(List<String> itemDetails) {
+        if (itemDetails == null || itemDetails.isEmpty()) {
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
+        }
+        if (itemDetails.size() == 1 || itemDetails.get(1).isEmpty()) {
+            throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
+        }
+    }
+
+    public void validateItemQuantity(int itemQuantity) {
+        if (itemQuantity <= 0) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
         }
     }
