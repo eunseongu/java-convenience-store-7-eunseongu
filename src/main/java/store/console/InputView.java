@@ -20,8 +20,8 @@ public class InputView {
         return askQuestion(String.format("현재 %s은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)", itemName));
     }
 
-    public static String askToPurchaseWithoutPromotion(String itemName, int itemCount) {
-        return askQuestion(String.format("현재 %s %d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)", itemName, itemCount));
+    public static String askToPurchaseWithoutPromotion(String itemName, int itemQuantity) {
+        return askQuestion(String.format("현재 %s %d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)", itemName, itemQuantity));
     }
 
     public static String askToPurchaseMoreItem() {

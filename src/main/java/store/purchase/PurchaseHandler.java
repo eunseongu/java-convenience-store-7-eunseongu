@@ -2,23 +2,23 @@ package store.purchase;
 
 import java.util.List;
 import store.console.InputHandler;
-import store.product.ProductInventory;
+import store.product.InventoryManager;
 import store.promotion.Promotion;
 import store.promotion.PromotionManager;
 import store.user.UserPurchaseHandler;
 
 public class PurchaseHandler {
     private final PromotionManager promotionManager;
-    private final UserPurchaseHandler UserPurchaseHandler;
+    private final UserPurchaseHandler userPurchaseHandler;
     private final InputHandler inputHandler;
-    private final ProductInventory productInventory;
+    private final InventoryManager productInventory;
 
 
-    public PurchaseHandler(PromotionManager promotionManager, UserPurchaseHandler UserPurchaseHandler,
+    public PurchaseHandler(PromotionManager promotionManager, UserPurchaseHandler userPurchaseHandler,
                            InputHandler inputHandler,
-                           ProductInventory productInventory) {
+                           InventoryManager productInventory) {
         this.promotionManager = promotionManager;
-        this.UserPurchaseHandler = UserPurchaseHandler;
+        this.userPurchaseHandler = userPurchaseHandler;
         this.inputHandler = inputHandler;
         this.productInventory = productInventory;
     }
@@ -52,12 +52,29 @@ public class PurchaseHandler {
         addItemToPurchases(item, promotion, freeItemQuantity);
     }
 
+    //    private void purchaseRegularItem(Item item) {
+//        try {
+//            productInventory.checkRegularStock(item.getName(), item.getQuantity());
+//            userPurchaseHandler.addRegularItem(item, item.getQuantity(), productInventory);
+//        } catch (IllegalArgumentException e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
     private void purchaseRegularItem(Item item) {
         try {
-            productInventory.checkRegularStock(item);
-            UserPurchaseHandler.addRegularItem(item, item.getQuantity(), productInventory);
+            productInventory.checkRegularStock(item.getName(), item.getQuantity());
+            processRegularPurchaseForUser(item.getName(), item.getQuantity());
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void processRegularPurchaseForUser(String name, int quantity) {
+        Integer price = productInventory.getProductPriceByName(name);
+
+        if (price != null) {
+            userPurchaseHandler.addRegularPurchase(name, quantity, price);
+            productInventory.decreaseRegularProductQuantity(name, quantity);
         }
     }
 
@@ -66,7 +83,7 @@ public class PurchaseHandler {
             // 프로모션 재고가 충분한지 체크
             if (productInventory.checkPromotionStock(item)) {
                 // 프로모션 재고가 충분하다면 프로모션 상품으로만 구매
-                UserPurchaseHandler.addPromotionItemWithFreeItem(item.getName(), item.getQuantity() + freeItemQuantity,
+                userPurchaseHandler.addPromotionItemWithFreeItem(item.getName(), item.getQuantity() + freeItemQuantity,
                         productInventory, promotion);
                 return;
             }
@@ -83,11 +100,11 @@ public class PurchaseHandler {
                                                Promotion promotion, int freeItemQuantity) {
         // 일반 상품으로 구매한다고 답변하면 일반 상품으로 구매
         if (inputHandler.askToPurchaseWithoutPromotion(item, requiredRegularStock)) {
-            UserPurchaseHandler.addRegularItem(item, requiredRegularStock, productInventory);
+            processRegularPurchaseForUser(item.getName(), requiredRegularStock);
         }
         // 일반 상품으로 구매하지 않겠다고 답변하면, 프로모션 재고로 구매 가능한 수량만 구매
         int remainingPromotionQuantity = item.getQuantity() - requiredRegularStock;
-        UserPurchaseHandler.addPromotionItemWithFreeItem(item.getName(), remainingPromotionQuantity + freeItemQuantity,
+        userPurchaseHandler.addPromotionItemWithFreeItem(item.getName(), remainingPromotionQuantity + freeItemQuantity,
                 productInventory,
                 promotion);
     }

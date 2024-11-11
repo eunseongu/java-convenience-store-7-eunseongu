@@ -1,4 +1,4 @@
-package store.purchase;
+package store;
 
 import java.util.List;
 import store.console.InputHandler;
@@ -7,22 +7,24 @@ import store.console.InputView;
 import store.console.OutputView;
 import store.loader.ProductLoader;
 import store.loader.PromotionLoader;
-import store.product.ProductInventory;
+import store.product.InventoryManager;
+import store.purchase.Item;
+import store.purchase.PurchaseHandler;
 import store.user.UserPurchaseHandler;
 
-public class PurchaseController {
+public class StoreController {
     private final ProductLoader productLoader;
     private final PromotionLoader promotionLoader;
     private final OutputView outputView;
 
-    public PurchaseController(ProductLoader productLoader, PromotionLoader promotionLoader, OutputView outputView) {
+    public StoreController(ProductLoader productLoader, PromotionLoader promotionLoader, OutputView outputView) {
         this.productLoader = productLoader;
         this.promotionLoader = promotionLoader;
         this.outputView = outputView;
     }
 
     public void run() {
-        ProductInventory productInventory = productLoader.getInventory();
+        InventoryManager productInventory = productLoader.getInventory();
         InputValidator inputValidator = new InputValidator();
         InputHandler inputHandler = new InputHandler(inputValidator);
 
@@ -43,7 +45,7 @@ public class PurchaseController {
         }
     }
 
-    private void processPurchase(ProductInventory productInventory, InputHandler inputHandler) {
+    private void processPurchase(InventoryManager productInventory, InputHandler inputHandler) {
         UserPurchaseHandler UserPurchaseHandler = new UserPurchaseHandler();
 
         outputView.printProducts(productInventory);

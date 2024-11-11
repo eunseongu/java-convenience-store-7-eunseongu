@@ -2,9 +2,8 @@ package store.user;
 
 import java.util.HashMap;
 import java.util.Map;
-import store.product.ProductInventory;
+import store.product.InventoryManager;
 import store.promotion.Promotion;
-import store.purchase.Item;
 
 public class UserPurchaseHandler {
     private final Map<String, PurchasedItem> regularPurchases;
@@ -25,16 +24,7 @@ public class UserPurchaseHandler {
         this.totalPrice = 0;
     }
 
-    public void addRegularItem(Item item, int quantity, ProductInventory inventory) {
-        String name = item.getName();
-        Integer price = inventory.getProductPriceByName(name);
-        if (price != null) {
-            addRegularPurchase(name, quantity, price);
-            inventory.decreaseRegularProductQuantity(name, quantity);
-        }
-    }
-
-    public void addPromotionItemWithFreeItem(String name, int totalQuantity, ProductInventory inventory,
+    public void addPromotionItemWithFreeItem(String name, int totalQuantity, InventoryManager inventory,
                                              Promotion promotion) {
         Integer price = inventory.getProductPriceByName(name);
 

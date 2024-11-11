@@ -5,12 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import store.product.InventoryManager;
 import store.product.Product;
-import store.product.ProductInventory;
 
 public class ProductLoader {
     private final int REQUIRED_FIELDS_COUNT = 4;
-    ProductInventory inventory = new ProductInventory();
+    InventoryManager inventory = new InventoryManager();
 
     public ProductLoader() {
         loadProducts();
@@ -59,7 +59,7 @@ public class ProductLoader {
         }
     }
 
-    public ProductInventory getInventory() {
+    public InventoryManager getInventory() {
         return inventory;
     }
 }

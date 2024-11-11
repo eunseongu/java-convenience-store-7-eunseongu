@@ -71,14 +71,12 @@ public class InputHandler {
             Item parsedItem = parseItemDetails(item);
             parsedItems.add(parsedItem);
         }
-
         return parsedItems;
     }
 
     private Item parseItemDetails(String item) {
         List<String> itemDetails = List.of(item.replace("[", "").replace("]", "").split("-"));
-
-        String itemName = itemDetails.get(0);
+        String itemName = itemDetails.getFirst();
         inputValidator.validateItemName(itemName);
 
         if (itemDetails.size() == 1 || itemDetails.get(1).isEmpty()) {
