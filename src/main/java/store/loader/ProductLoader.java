@@ -5,15 +5,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import store.product.InventoryManager;
 import store.product.Product;
+import store.product.storeInventory;
 
 public class ProductLoader {
-    private final int REQUIRED_FIELDS_COUNT = 4;
-    InventoryManager inventory = new InventoryManager();
+    storeInventory inventory = new storeInventory();
 
     public ProductLoader() {
         loadProducts();
+    }
+
+    public storeInventory getInventory() {
+        return inventory;
     }
 
     private void loadProducts() {
@@ -43,6 +46,8 @@ public class ProductLoader {
     }
 
     private boolean hasValidFieldCount(List<String> fields) {
+        int REQUIRED_FIELDS_COUNT = 4;
+
         return fields.size() == REQUIRED_FIELDS_COUNT;
     }
 
@@ -57,9 +62,5 @@ public class ProductLoader {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    public InventoryManager getInventory() {
-        return inventory;
     }
 }

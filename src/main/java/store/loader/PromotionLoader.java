@@ -6,14 +6,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import store.promotion.Promotion;
-import store.promotion.PromotionManager;
+import store.promotion.PromotionCatalog;
 
 public class PromotionLoader {
-    private final int REQUIRED_FIELDS_COUNT = 5;
-    private final PromotionManager promotionManager = new PromotionManager();
+    private final PromotionCatalog promotionCatalog = new PromotionCatalog();
 
     public PromotionLoader() {
         loadPromotions();
+    }
+
+    public PromotionCatalog getInformation() {
+        return promotionCatalog;
     }
 
     private void loadPromotions() {
@@ -36,12 +39,14 @@ public class PromotionLoader {
         if (hasValidFieldCount(fields)) {
             Promotion promotion = createPromotionFromFields(fields);
             if (promotion != null) {
-                promotionManager.register(promotion);
+                promotionCatalog.register(promotion);
             }
         }
     }
 
     private boolean hasValidFieldCount(List<String> fields) {
+        int REQUIRED_FIELDS_COUNT = 5;
+        
         return fields.size() == REQUIRED_FIELDS_COUNT;
     }
 
@@ -57,9 +62,5 @@ public class PromotionLoader {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    public PromotionManager getInformation() {
-        return promotionManager;
     }
 }

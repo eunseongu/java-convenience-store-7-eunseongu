@@ -5,12 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 import store.console.InputHandler;
 import store.console.InputValidator;
-import store.product.InventoryManager;
 import store.util.ErrorMessage;
 
 
 class ItemTest {
-    private final InventoryManager productInventory = new InventoryManager();
     private final InputValidator inputValidator = new InputValidator();
     private final InputHandler inputHandler = new InputHandler(inputValidator);
 

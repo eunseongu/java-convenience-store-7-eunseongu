@@ -8,7 +8,7 @@ import store.promotion.Promotion;
 import store.purchase.Item;
 import store.util.ErrorMessage;
 
-public class InventoryManager {
+public class storeInventory {
     private final Map<String, List<Product>> inventory = new HashMap<>();
 
     public void addProduct(Product product) {
@@ -111,7 +111,7 @@ public class InventoryManager {
         }
     }
 
-    // 일반
+    // 일반 상품 재고 계산
     private int calculateRegularStock(List<Product> products) {
         return products.stream()
                 .filter(product -> !product.isPromotion())

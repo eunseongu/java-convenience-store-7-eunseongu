@@ -5,12 +5,12 @@ import store.console.InputHandler;
 import store.console.InputValidator;
 import store.console.InputView;
 import store.console.OutputView;
+import store.customer.PurchasedItemHandler;
 import store.loader.ProductLoader;
 import store.loader.PromotionLoader;
-import store.product.InventoryManager;
+import store.product.storeInventory;
 import store.purchase.Item;
 import store.purchase.PurchaseHandler;
-import store.user.UserPurchaseHandler;
 
 public class StoreController {
     private final ProductLoader productLoader;
@@ -24,11 +24,11 @@ public class StoreController {
     }
 
     public void run() {
-        InventoryManager inventoryManager = productLoader.getInventory();
+        storeInventory storeInventory = productLoader.getInventory();
         InputValidator inputValidator = new InputValidator();
         InputHandler inputHandler = new InputHandler(inputValidator);
 
-        processPurchase(inventoryManager, inputHandler);
+        handleCustomerPurchase(storeInventory, inputHandler);
 
         while (true) {
             String response = InputView.askToPurchaseMoreItem();
@@ -38,27 +38,29 @@ public class StoreController {
                 if ("N".equalsIgnoreCase(response)) {
                     break;
                 }
-                processPurchase(inventoryManager, inputHandler);
+                handleCustomerPurchase(storeInventory, inputHandler);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
 
-    private void processPurchase(InventoryManager productInventory, InputHandler inputHandler) {
-        UserPurchaseHandler UserPurchaseHandler = new UserPurchaseHandler();
+    private void handleCustomerPurchase(storeInventory productInventory, InputHandler inputHandler) {
+        PurchasedItemHandler purchasedItemHandler = new PurchasedItemHandler();
 
         outputView.printProducts(productInventory);
-        List<Item> items = inputHandler.getValidatedItems();
-        PurchaseHandler promotionHandler = new PurchaseHandler(promotionLoader.getInformation(), UserPurchaseHandler,
-                inputHandler, productInventory);
 
-        promotionHandler.handlePurchase(items);
+        List<Item> items = inputHandler.getValidatedItems();
+
+        PurchaseHandler purchaseHandler = new PurchaseHandler(promotionLoader.getInformation(),
+                purchasedItemHandler,
+                inputHandler, productInventory);
+        purchaseHandler.handlePurchase(items);
 
         if (inputHandler.askToMembershipDiscount()) {
-            UserPurchaseHandler.calculateMembershipDiscount();
+            purchasedItemHandler.applyMembershipDiscount();
         }
 
-        outputView.printReceipt(UserPurchaseHandler);
+        outputView.printReceipt(purchasedItemHandler);
     }
 }

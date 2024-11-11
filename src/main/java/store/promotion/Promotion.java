@@ -39,7 +39,7 @@ public class Promotion {
         return purchaseQuantity % BuyNGet1Free == this.buyQuantity;
     }
 
-    public boolean isPromotionActive() {
+    public boolean checkActivePromotion() {
         LocalDate now = DateTimes.now().toLocalDate();
         return (now.isAfter(startDate) || now.isEqual(startDate)) && now.isBefore(endDate);
     }
